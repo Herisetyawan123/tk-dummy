@@ -22,6 +22,7 @@ urlpatterns = [
 
     # jenis pekerjaan
     path('home/subkategori/<str:subcategory_id>/', subkategori, name='sub_category'),
+    path('worker/mypay', my_app, name="my_pay_worker")
 
     # worker
     path('home/worker/', home_worker, name='home_worker'),
