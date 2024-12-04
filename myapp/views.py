@@ -359,8 +359,8 @@ def my_pay(request):
         if Worker.objects.filter(phone=phone).exists():
             pengguna = Worker.objects.get(phone=phone)
         transactions = pengguna.transactions.all()
-        print(pengguna.transactions.all())
-        return render(request, 'user/mypay.html', {"pengguna": pengguna, "transactions": transactions})
+        role = request.session['role']
+        return render(request, 'user/mypay.html', {"pengguna": pengguna, "transactions": transactions, 'role': role})
 
 def transaksi_mypay_view(request):
     # Ambil user_type dari sesi
@@ -697,6 +697,7 @@ def beli_diskon(request, diskon_id):
                 "expiry_date": diskon.expired_date,
                 "quota": diskon.usage_quota
             })
+
 def kelola_pekerjaan_worker(request):
     if 'worker_phone' not in request.session:
         return redirect('login')
