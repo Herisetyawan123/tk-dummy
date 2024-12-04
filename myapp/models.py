@@ -91,7 +91,8 @@ class Worker(models.Model):
 
 
 class Transaction(models.Model):    
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="transactions", verbose_name="User")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="transactions", verbose_name="User", null=True)
+    worker = models.ForeignKey(Worker, on_delete=models.CASCADE, related_name="transactions", verbose_name="Worker", null=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Transaction Time")
     category = models.CharField(max_length=100)
     amount = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Transaction Amount")
