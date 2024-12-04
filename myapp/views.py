@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from .database import add_user, add_worker, user_exists, worker_exists, users_db, workers_db
 from .forms import UserRegistrationForm, WorkerRegistrationForm
-from .models import User, Worker, JobCategory, SubJobCategory, Transaction, Service, Discount, Order
-from datetime import datetime
+from .models import User, Worker, JobCategory, SubJobCategory, Transaction, Service, Discount, Order, PurchasedVoucher
+from datetime import datetime, date
 from django.contrib import messages
 from django.http import JsonResponse
 
@@ -584,3 +584,38 @@ def view_pemesanan(request, id):
         # Simpan data ke database
         order.save()
     return render(request, 'user/pemesanan.html', { 'service': service })
+
+def beli_diskon(request, diskon_id):
+    diskon = Discount.objects.get(id=diskon_id)
+    user = User.objects.get(phone=request.session['user_phone'])
+
+    if user.saldo < diskon.voucher_price:
+        return JsonResponse(
+            {
+                "message": "Saldo anda tidak mencukupi"
+            }
+        )
+    user.saldo -= diskon.voucher_price
+    user.save()
+
+            # Pastikan diskon belum expired
+    if diskon.expired_date and diskon.expired_date < date.today():
+        return JsonResponse({"message": "Diskon telah kedaluwarsa"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if PurchasedVoucher.objects.filter(user=user, discount=diskon).exists():
+        return JsonResponse(
+            {"message": "Voucher ini sudah pernah dibeli oleh Anda"},
+        )
+
+    purchased_voucher = PurchasedVoucher.objects.create(user=user, discount=diskon)
+        
+ 
+    print(diskon.voucher_price)
+    return JsonResponse({
+                "status": "success",
+                "message": f"Selamat! Anda berhasil membeli voucher kode {diskon.code}.",
+                "new_saldo": user.saldo,
+                "code": diskon.code,
+                "expiry_date": diskon.expired_date,
+                "quota": diskon.usage_quota
+            })

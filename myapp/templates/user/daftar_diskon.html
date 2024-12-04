@@ -144,7 +144,7 @@
 
         <script>
           function beliVoucher(voucherId) {
-            fetch(`/feat_3_blue/beli-voucher/${voucherId}/`, {
+            fetch(`/myapp/home/beli-diskon/${voucherId}`, {
               method: "POST",
               headers: {
                 "X-CSRFToken": "{{ csrf_token }}",

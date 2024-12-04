@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import choose_role, register_user, register_worker, login, home_user, home_worker, logout, landing, profile, subkategori, daftar_diskon, my_pay, kelola_pesanan, transaksi_mypay_view, view_pemesanan, get_user_pending_orders
+from .views import choose_role, register_user, register_worker, login, home_user, home_worker, logout, landing, profile, subkategori, daftar_diskon, my_pay, kelola_pesanan, transaksi_mypay_view, view_pemesanan, get_user_pending_orders, beli_diskon
 
 urlpatterns = [
     path('', landing, name='landing'),
@@ -17,6 +17,7 @@ urlpatterns = [
     path('user/pending-orders', get_user_pending_orders, name='api_pesanan'),
     path('home/kelola-pesanan/', kelola_pesanan, name='kelola_pesanan'),
     path('home/daftar-diskon/', daftar_diskon, name='daftar_diskon'),
+    path('home/beli-diskon/<str:diskon_id>', beli_diskon, name='beli_diskon'),
 
     # jenis pekerjaan
     path('home/subkategori/<str:subcategory_id>/', subkategori, name='sub_category'),
