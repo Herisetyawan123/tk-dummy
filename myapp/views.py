@@ -619,3 +619,28 @@ def beli_diskon(request, diskon_id):
                 "expiry_date": diskon.expired_date,
                 "quota": diskon.usage_quota
             })
+def kelola_pekerjaan_worker(request):
+    if 'worker_phone' not in request.session:
+        return redirect('login')
+    
+    categories = JobCategory.objects.all()
+    return render(request, 'worker/kelola_pekerjaan.html', {'categories': categories})
+
+
+
+def get_subkategori(request, kategori_id):
+    if 'worker_phone' not in request.session:
+        return redirect('login')
+    sub_job_kategoris = SubJobCategory.objects.filter(category_id=kategori_id).values('id', 'name')
+    return JsonResponse(list(sub_job_kategoris), safe=False)
+
+def kelola_status_pekerjaan(request):
+    if 'worker_phone' not in request.session:
+        return redirect('login')
+    
+    return render(request, 'worker/kelola_status_pekerjaan.html')
+
+def profile_worker(request):
+    if 'worker_phone' not in request.session:
+        return redirect('login')
+    return render(request, 'worker/profile.html')
