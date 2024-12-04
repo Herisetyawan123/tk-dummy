@@ -103,6 +103,7 @@ class Discount(models.Model):
     max_usage = models.PositiveIntegerField(verbose_name="Max Usage")
     usage_quota = models.PositiveIntegerField(default=0, verbose_name="Usage Quota")  # Track usage count
     voucher_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Voucher Price")
+    expired_date = models.DateField(null=True, blank=True) 
 
     def __str__(self):
         return f"{self.code} - {self.percentage}% off"
@@ -155,3 +156,13 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order #{self.id} - {self.service.name} ({self.get_status_display()})"
+
+class PurchasedVoucher(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Pembeli", related_name="vouchers")
+    discount = models.ForeignKey(Discount, on_delete=models.CASCADE, verbose_name="Diskon", related_name="purchased_vouchers")
+    purchase_date = models.DateTimeField(auto_now_add=True, verbose_name="Tanggal Pembelian")
+    is_used = models.BooleanField(default=False, verbose_name="Telah Digunakan")
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.discount.code} - {'Digunakan' if self.is_used else 'Belum Digunakan'}"
+        

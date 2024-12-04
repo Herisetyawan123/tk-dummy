@@ -340,7 +340,10 @@ def home_user(request):
 
 
 def daftar_diskon(request):
-    return render(request, 'user/daftar_diskon.html')
+    vouchers = Discount.objects.filter(voucher_price__gt=0)
+    promos = Discount.objects.filter(voucher_price=0)
+    print(promos)
+    return render(request, 'user/daftar_diskon.html', {'vouchers': vouchers, 'promos': promos})
 
 def my_pay(request):
     phone = request.session['user_phone']

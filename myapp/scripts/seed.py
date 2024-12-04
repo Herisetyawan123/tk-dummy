@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from myapp.models import JobCategory, SubJobCategory, Service, User, Worker, Discount  # Ganti `myapp` dengan nama aplikasi Anda
 from datetime import  datetime
+from datetime import date, timedelta
 import random
 from decimal import Decimal
 
@@ -110,25 +111,48 @@ def run():
         'photo_url': 'htttp://example.com',
     }
 
-    promo_codes = ['PROMO2024', 'SALE50', 'NEWYEAR10', 'DISCOUNT30', 'BLACKFRIDAY15']
+    promo_codes = ['PROMO2024', 'SALE50', 'NEWYEAR10', 'DISCOUNT30', 'BLACKFRIDAY15', 'PROMO10', 'PROMO20']
 
     for promo_code in promo_codes:  # Menghasilkan 10 data diskon sebagai contoh
-        code = promo_code
-        percentage = random.randint(5, 50)  # Diskon antara 5% hingga 50%
-        min_transaction = 150000  # Minimal transaksi antara 50 hingga 500
-        max_usage = random.randint(1, 100)  # Maksimum penggunaan antara 1 hingga 100
-        usage_quota = random.randint(0, max_usage)  # Kuota penggunaan diskon
-        voucher_price = Decimal(random.randint(50000, 100000))  # Harga voucher antara 50,000 hingga 100,000
 
-        # Buat dan simpan objek Discount
-        discount = Discount.objects.create(
-            code=code,
-            percentage=Decimal(percentage),
-            min_transaction=min_transaction,
-            max_usage=max_usage,
-            usage_quota=usage_quota,
-            voucher_price=voucher_price
-        )
+        if 'PROMO' in promo_code:
+            code = promo_code
+            percentage = 10  # Diskon antara 5% hingga 50%
+            min_transaction = 150000  # Minimal transaksi antara 50 hingga 500
+            max_usage = 2  # Maksimum penggunaan antara 1 hingga 100
+            usage_quota = random.randint(0, max_usage)  # Kuota penggunaan diskon
+            voucher_price = 0  # Harga voucher antara 50,000 hingga 100,000
+            expired_date = date.today() + timedelta(days=random.randint(0, 30))
+            # Buat dan simpan objek Discount
+            discount = Discount.objects.create(
+                code=code,
+                percentage=Decimal(percentage),
+                min_transaction=min_transaction,
+                max_usage=max_usage,
+                usage_quota=usage_quota,
+                voucher_price=voucher_price,
+                expired_date=expired_date
+            )
+
+        else:
+            code = promo_code
+            percentage = random.randint(5, 50)  # Diskon antara 5% hingga 50%
+            min_transaction = 150000  # Minimal transaksi antara 50 hingga 500
+            max_usage = random.randint(1, 100)  # Maksimum penggunaan antara 1 hingga 100
+            usage_quota = random.randint(0, max_usage)  # Kuota penggunaan diskon
+            voucher_price = Decimal(random.randint(50000, 100000))  # Harga voucher antara 50,000 hingga 100,000
+            expired_date = date.today() + timedelta(days=random.randint(0, 30))
+
+            # Buat dan simpan objek Discount
+            discount = Discount.objects.create(
+                code=code,
+                percentage=Decimal(percentage),
+                min_transaction=min_transaction,
+                max_usage=max_usage,
+                usage_quota=usage_quota,
+                voucher_price=voucher_price,
+                expired_date=expired_date
+            )
 
 
     User.objects.create(

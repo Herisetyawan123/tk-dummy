@@ -50,25 +50,25 @@
               </tr>
             </thead>
             <tbody>
-              {% for voucher in voucher_data %}
+              {% for voucher in vouchers %}
               <tr>
                 <td class="border border-[#c8cc7d] p-2 text-center">
                   {{ voucher.code }}
                 </td>
                 <td class="border border-[#c8cc7d] p-2 text-center">
-                  {{ voucher.potongan }}
+                  {{ voucher.percentage }}%
                 </td>
                 <td class="border border-[#c8cc7d] p-2 text-center">
-                  {{ voucher.min_transaksi }}
+                  {{ voucher.min_transaction }}
                 </td>
                 <td class="border border-[#c8cc7d] p-2 text-center">
-                  {{ voucher.hari_berlaku }}
+                  {{ voucher.max_usage }}
                 </td>
                 <td class="border border-[#c8cc7d] p-2 text-center">
-                  {{ voucher.kuota }}
+                  {{ voucher.usage_quota }}
                 </td>
                 <td class="border border-[#c8cc7d] p-2 text-center">
-                  {{ voucher.harga }}
+                  {{ voucher.voucher_price }}
                 </td>
                 <td class="border border-[#c8cc7d] p-2 text-center">
                   <button
@@ -103,13 +103,13 @@
               </tr>
             </thead>
             <tbody>
-              {% for promo in promo_data %}
+              {% for promo in promos %}
               <tr>
                 <td class="border border-[#c8cc7d] p-2 text-center">
                   {{ promo.code }}
                 </td>
                 <td class="border border-[#c8cc7d] p-2 text-center">
-                  {{ promo.expiry_date }}
+                  {{ promo.expired_date }}
                 </td>
               </tr>
               {% empty %}
