@@ -63,15 +63,24 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for order in orders %}
                       <tr class="hover-effect">
-                        <td class="p-4 text-center border-t">Desain Grafis</td>
-                        <td class="p-4 text-center border-t">Kunto</td>
+                        <td class="p-4 text-center border-t">
+                            {{ order.service.sub_category.name }}
+                        </td>
+                        <td class="p-4 text-center border-t">{{ order.user.name }}</td>
                         <td class="p-4 text-center border-t">20-12-2023</td>
-                        <td class="p-4 text-center border-t"></td>
-                        <td class="p-4 text-center border-t">Rp 500000</td>
-                        <td class=""><button type="button" class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">Kerjakan Pesanan</button></td>
+
+                        <td class="p-4 text-center border-t">{{ order.service.name }}</td>
+                        <td class="p-4 text-center border-t">Rp {{ order.total_price }}</td>
+                        <td class=""><a href="{% url 'kerjakan_service' order.id %}" class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">Kerjakan Pesanan</a></td>
                     </tr>
-                    </tbody>
+                             {% empty %}
+                        <tr>
+                            <td colspan="6" class="p-4 text-center text-gray-500">Belum ada pesanan yang ditemukan.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
                     <!-- <tbody>
                         {% for order in orders %}
                             <tr class="hover-effect">

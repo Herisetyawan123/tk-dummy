@@ -114,8 +114,11 @@ class Order(models.Model):
         ('AWAITING_PAYMENT', 'Menunggu Pembayaran'),
         ('SEARCHING_WORKER', 'Mencari Pekerja Terdekat'),
         ('WORKER_FOUND', 'Mendapatkan Pekerja'),
+        ('WAITING_WORKER', 'Menunggu Pekerja Tiba'),
+        ('ARRIVE_WORKER', 'Pekerja Tiba'),
         ('IN_PROGRESS', 'Dikerjakan'),
         ('COMPLETED', 'Selesai'),
+        ('CANCELED', 'Dibatalkan'),
     ]
 
     user = models.ForeignKey(

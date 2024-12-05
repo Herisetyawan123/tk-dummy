@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from .database import add_user, add_worker, user_exists, worker_exists, users_db, workers_db
 from .forms import UserRegistrationForm, WorkerRegistrationForm
-from .models import User, Worker, JobCategory, SubJobCategory, Transaction, Service, Discount, Order, PurchasedVoucher
+from .models import User, Worker, JobCategory, SubJobCategory, Transaction, Service, Discount, Order, PurchasedVoucher, Testimonial
 from datetime import datetime, date
 from django.contrib import messages
 from django.http import JsonResponse
@@ -317,9 +317,9 @@ def subkategori(request, subcategory_id):
         subkategori = SubJobCategory.objects.get(id=1)
         services = subkategori.services.all()
 
-        testimonials = subkategori.testimonials.all()
+        testimonials = subkategori.services.testimonial.all()
         workers = subkategori.workers.all()
-    
+        print(testimonials)
         return render(request, 'sub_category.html', {'subcategory': subkategori, 'services': services, 'testimonials': testimonials, 'workers': workers, "role": request.session['role']})
     except SubJobCategory.DoesNotExist:
         return render(request, '404.html', {'message': 'ID Subkategori tidak ditemukan atau tidak valid.'}, status=404)
@@ -353,14 +353,19 @@ def my_pay(request):
         if User.objects.filter(phone=phone).exists():
             pengguna = User.objects.get(phone=phone)
         transactions = pengguna.transactions.all()
-        return render(request, 'user/mypay.html', {"pengguna": pengguna, "transactions": transactions})
+        role = request.session['role']
+        print(role)
+        return render(request, 'user/mypay.html', {"pengguna": pengguna, "transactions": transactions, 'role': role})
     elif 'worker_phone' in request.session:
         phone = request.session['worker_phone']
         if Worker.objects.filter(phone=phone).exists():
             pengguna = Worker.objects.get(phone=phone)
         transactions = pengguna.transactions.all()
         role = request.session['role']
+        print(role)
         return render(request, 'user/mypay.html', {"pengguna": pengguna, "transactions": transactions, 'role': role})
+    else:
+        redirect('login')
 
 def transaksi_mypay_view(request):
     # Ambil user_type dari sesi
@@ -429,7 +434,7 @@ def transaksi_mypay_view(request):
                   
                     order = Order.objects.get(id=pesanan_jasa)
                     print(order.total_price)
-                    if saldo_user >= order.total_price:
+                    if user.saldo >= order.total_price:
                         # TODO: prosess
                         order.status = 'SEARCHING_WORKER'
                         user.saldo -= order.total_price
@@ -565,7 +570,7 @@ def transaksi_mypay_view(request):
         else:
             messages.error(request, 'Kategori transaksi tidak valid.')
 
-        return redirect('my_app')
+        return redirect('/myapp/home/transaksi-user-mypay')
 
     # Data dummy untuk form
     pengguna = user
@@ -703,9 +708,8 @@ def kelola_pekerjaan_worker(request):
         return redirect('login')
     
     categories = JobCategory.objects.all()
-    return render(request, 'worker/kelola_pekerjaan.html', {'categories': categories})
-
-
+    orders = Order.objects.filter(status="SEARCHING_WORKER")
+    return render(request, 'worker/kelola_pekerjaan.html', {'categories': categories, "orders": orders})
 
 def get_subkategori(request, kategori_id):
     if 'worker_phone' not in request.session:
@@ -713,11 +717,67 @@ def get_subkategori(request, kategori_id):
     sub_job_kategoris = SubJobCategory.objects.filter(category_id=kategori_id).values('id', 'name')
     return JsonResponse(list(sub_job_kategoris), safe=False)
 
-def kelola_status_pekerjaan(request):
+def kerjakan_service(request, order_id):
     if 'worker_phone' not in request.session:
         return redirect('login')
     
-    return render(request, 'worker/kelola_status_pekerjaan.html')
+    worker = Worker.objects.get(phone=request.session['worker_phone'])
+    order = Order.objects.get(id=order_id)
+    order.worker = worker
+    order.status = "WAITING_WORKER"
+    order.save()
+
+    return redirect('kelola_status_pekerjaan')
+
+def batal_pesanan(request, order_id):
+    order = Order.objects.get(id=order_id)    
+    if order.status != "AWAITING_PAYMENT":
+        user = User.objects.get(phone=request.session['user_phone'])
+        user.saldo += order.total_price
+        user.save()
+    order.status = "CANCELED"
+    order.save()
+    return redirect('kelola_pesanan')
+
+def update_service(request, order_id):
+    order = Order.objects.get(id=order_id)  
+    print(order.status)  
+    if order.status == "WAITING_WORKER":
+        order.status = "ARRIVE_WORKER"
+    elif order.status == "ARRIVE_WORKER":
+        order.status = "IN_PROGRESS"
+    elif order.status == "IN_PROGRESS":
+        order.status = "COMPLETED"
+    order.save()
+    return redirect('kelola_status_pekerjaan')
+
+def buat_testimoni(request, order_id):
+    if "user_phone" not in request.session:
+        return redirect('login')
+
+    if request.method == "POST":
+        rating = request.POST.get('rating')
+        text = request.POST.get('text')
+
+        user = User.objects.get(phone=request.session['user_phone'])
+        order = Service.objects.get(id=order_id)
+        testi = Testimonial.objects.create(
+            user=user,
+            service=order,
+            rating=rating,
+            text=text
+        )
+        return redirect('kelola_pesanan')
+    return render(request, 'user/buat_testimoni.html', { "order_id": order_id, "range": range(1, 11) })
+
+def kelola_status_pekerjaan(request):
+    if 'worker_phone' not in request.session:
+        return redirect('login')
+    categories = JobCategory.objects.all()
+    worker = Worker.objects.get(phone=request.session['worker_phone'])
+    orders = Order.objects.filter(worker=worker)
+        
+    return render(request, 'worker/kelola_status_pekerjaan.html', {"orders": orders})
 
 def profile_worker(request):
     if 'worker_phone' not in request.session:
