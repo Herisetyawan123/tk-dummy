@@ -321,7 +321,7 @@ def subkategori(request, subcategory_id):
         testimonials = None
         workers = subkategori.workers.all()
         service_ids = [service.id for service in services]
-        testimonials = Testimonial.objects.filter(Service__in=services)
+        testimonials = Testimonial.objects.filter(service__in=services)
         return render(request, 'sub_category.html', {'subcategory': subkategori, 'services': services, 'testimonials': testimonials, 'workers': workers, "role": request.session['role']})
     except SubJobCategory.DoesNotExist:
         return render(request, '404.html', {'message': 'ID Subkategori tidak ditemukan atau tidak valid.'}, status=404)

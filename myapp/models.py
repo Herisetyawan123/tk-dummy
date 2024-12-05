@@ -63,7 +63,7 @@ class Service(models.Model):
 
 class Testimonial(models.Model):
     user = models.ForeignKey(User, related_name='testimonials', on_delete=models.CASCADE)  # Link to the User model
-    Service = models.ForeignKey(Service, related_name='testimonials', on_delete=models.CASCADE)  # Link to SubJobCategory
+    service = models.ForeignKey(Service, related_name='testimonials', on_delete=models.CASCADE)  # Link to SubJobCategory
     text = models.TextField()  # Field to store the testimonial text
     rating = models.PositiveIntegerField()  # Field to store the rating (1-5, for example)
 
