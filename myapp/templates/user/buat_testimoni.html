@@ -45,35 +45,57 @@
       </div>
     </div>
 
-    <div
-      class="row justify-content-center"
-      style="display: flex; justify-content: center"
-    >
-      <div class="container">
-        <!-- Header Section -->
-        <div class="header-flex">
-          <div><strong>No HP:</strong> {{ pengguna.phone }}</div>
-          <div><strong>Saldo:</strong> {{ pengguna.saldo }}</div>
-          <div>
-            <a href="{% url 'transaksi_user_mypay' %}">
-              <button class="btn">Lakukan Transaksi</button>
-            </a>
+    <div class="flex justify-center items-center min-h-screen bg-[#f5f5dc]">
+      <div
+        class="w-96 bg-white shadow-md rounded-md p-6 border border-[#c8cc7d]"
+      >
+        <h2 class="text-xl font-semibold mb-6 text-center text-[#969b4a]">
+          Form Testimoni
+        </h2>
+        <form method="post" action="{% url 'buat_testimoni' order_id %}">
+          {% csrf_token %}
+          <!-- Rating Input -->
+          <div class="mb-4">
+            <label
+              for="rating"
+              class="block text-left text-[#646733] font-semibold mb-2"
+              >Rating :</label
+            >
+            <select
+              name="rating"
+              id="rating"
+              class="w-full border border-[#969b4a] rounded-md p-2"
+            >
+              {% for i in range %}
+              <option value="{{ i }}">{{ i }}</option>
+              {% endfor %}
+            </select>
           </div>
-        </div>
-
-        <!-- Riwayat Transaksi Section -->
-        <div class="rounded-rectangle">
-          <h2>Riwayat Transaksi</h2>
-          {% for transaction in transactions %}
-          <div class="transaction-item">
-            <div class="transaction-amount">{{ transaction.amount }}</div>
-            <div class="transaction-date">{{ transaction.created_at }}</div>
-            <div class="transaction-type">{{ transaction.category }}</div>
+          <!-- Komentar Input -->
+          <div class="mb-4">
+            <label
+              for="text"
+              class="block text-left text-[#646733] font-semibold mb-2"
+              >Komentar :</label
+            >
+            <textarea
+              name="text"
+              id="text"
+              rows="5"
+              required
+              class="w-full border border-[#969b4a] rounded-md p-2"
+            ></textarea>
           </div>
-          {% empty %}
-          <p>No transactions yet.</p>
-          {% endfor %}
-        </div>
+          <!-- Submit Button -->
+          <div class="text-center">
+            <button
+              type="submit"
+              class="bg-[#969b4a] text-white px-6 py-2 rounded-md hover:bg-[#646733]"
+            >
+              Submit
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </body>

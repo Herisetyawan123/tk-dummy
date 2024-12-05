@@ -18,7 +18,8 @@
               <a href="{% url 'kelola_pesanan' %}">Kelola Pesanan Saya</a>
             </li>
             <li><a href="{% url 'daftar_diskon' %}">Diskon</a></li>
-            <li><a href="#">Profile</a></li>
+            <li><a href="{% url 'profile' %}">Profile</a></li>
+
             <li><a href="{% url 'logout' %}">Logout</a></li>
           </ul>
         </nav>
@@ -144,7 +145,7 @@
 
         <script>
           function beliVoucher(voucherId) {
-            fetch(`/feat_3_blue/beli-voucher/${voucherId}/`, {
+            fetch(`/myapp/home/beli-diskon/${voucherId}`, {
               method: "POST",
               headers: {
                 "X-CSRFToken": "{{ csrf_token }}",

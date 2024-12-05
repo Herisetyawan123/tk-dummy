@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from .database import add_user, add_worker, user_exists, worker_exists, users_db, workers_db
 from .forms import UserRegistrationForm, WorkerRegistrationForm
-from .models import User, Worker, JobCategory, SubJobCategory, Transaction, Service, Discount, Order
-from datetime import datetime
+from .models import User, Worker, JobCategory, SubJobCategory, Transaction, Service, Discount, Order, PurchasedVoucher, Testimonial
+from datetime import datetime, date
 from django.contrib import messages
 from django.http import JsonResponse
 
@@ -317,9 +317,11 @@ def subkategori(request, subcategory_id):
         subkategori = SubJobCategory.objects.get(id=1)
         services = subkategori.services.all()
 
-        testimonials = subkategori.testimonials.all()
+        # testimonials = subkategori.services.testimonial.all()
+        testimonials = None
         workers = subkategori.workers.all()
-    
+        service_ids = [service.id for service in services]
+        testimonials = Testimonial.objects.filter(Service__in=services)
         return render(request, 'sub_category.html', {'subcategory': subkategori, 'services': services, 'testimonials': testimonials, 'workers': workers, "role": request.session['role']})
     except SubJobCategory.DoesNotExist:
         return render(request, '404.html', {'message': 'ID Subkategori tidak ditemukan atau tidak valid.'}, status=404)
@@ -346,47 +348,78 @@ def daftar_diskon(request):
     return render(request, 'user/daftar_diskon.html', {'vouchers': vouchers, 'promos': promos})
 
 def my_pay(request):
-    phone = request.session['user_phone']
-    penggunan = None
-    if User.objects.filter(phone=phone).exists():
-        pengguna = User.objects.get(phone=phone)
-    transactions = pengguna.transactions.all()
-    return render(request, 'user/mypay.html', {"pengguna": pengguna, "transactions": transactions})
+    phone = None
+    if 'user_phone' in request.session:
+        pengguna = None
+        phone = request.session['user_phone']
+        if User.objects.filter(phone=phone).exists():
+            pengguna = User.objects.get(phone=phone)
+        transactions = pengguna.transactions.all()
+        role = request.session['role']
+        print(role)
+        return render(request, 'user/mypay.html', {"pengguna": pengguna, "transactions": transactions, 'role': role})
+    elif 'worker_phone' in request.session:
+        phone = request.session['worker_phone']
+        if Worker.objects.filter(phone=phone).exists():
+            pengguna = Worker.objects.get(phone=phone)
+        transactions = pengguna.transactions.all()
+        role = request.session['role']
+        print(role)
+        return render(request, 'user/mypay.html', {"pengguna": pengguna, "transactions": transactions, 'role': role})
+    else:
+        redirect('login')
 
 def transaksi_mypay_view(request):
     # Ambil user_type dari sesi
     user_type = request.session.get('role', 'User')  # Default ke 'Pengguna' jika tidak diatur
 
+    user = None
+    orders = None
+    if 'user_phone' in request.session:
+        try:
+            user_order = User.objects.get(phone=request.session['user_phone'])
+        except User.DoesNotExist:
+            return render(request, 'error.html', {'message': 'User not found'})
 
-    try:
-        user_order = User.objects.get(phone=request.session['user_phone'])
-    except User.DoesNotExist:
-        return render(request, 'error.html', {'message': 'User not found'})
+        # Ambil semua order yang statusnya "Menunggu Pembayaran"
+        orders = Order.objects.filter(user=user_order, status="AWAITING_PAYMENT")
 
-    # Ambil semua order yang statusnya "Menunggu Pembayaran"
-    orders = Order.objects.filter(user=user_order, status="AWAITING_PAYMENT")
+    auth_role = "user"
+    if 'user_phone' in request.session:
+        user = User.objects.get(phone=request.session['user_phone'])
+    elif 'worker_phone' in request.session:
+        auth_role = "worker"
+        user = Worker.objects.get(phone=request.session['worker_phone'])
+
+    if user == None:
+        return redirect('login')
     if request.method == 'POST':
         # print(kategori)
         kategori = request.POST.get('kategori_transaksi')
-        tanggal_transaksi = datetime.datetime.now().strftime('%Y-%m-%d')
-        user = User.objects.get(phone=request.session['user_phone'])
+        tanggal_transaksi = datetime.datetime.now().strftime('%Y-%m-%d')        
         saldo_user = user.saldo
         if kategori == 'TOP UP MY PAY':
             nominal = int(request.POST.get('nominal', 0))
             if nominal > 0:
                 # request.session['saldo'] += nominal
-                user = User.objects.get(phone=request.session["user_phone"])
                 print(user)
                 user.saldo += nominal
                 user.save()
-                user = User.objects.get(phone=request.session['user_phone'])  # Atau gunakan ID jika lebih spesifik
 
-                # Buat instance transaksi
-                transaction = Transaction(
-                    user=user,
-                    category="TOPUP",
-                    amount=nominal
-                )
+                if request.session['role'] == 'User':
+                    # Buat instance transaksi
+                    transaction = Transaction(
+                        user=user,
+                        category="TOPUP",
+                        amount=nominal
+                    )
+                else:
+                    # Buat instance transaksi
+                    transaction = Transaction(
+                        worker=user,
+                        category="TOPUP",
+                        amount=nominal
+                    )
 
                 # Simpan transaksi ke database
                 transaction.save()
@@ -403,7 +436,7 @@ def transaksi_mypay_view(request):
                   
                     order = Order.objects.get(id=pesanan_jasa)
                     print(order.total_price)
-                    if saldo_user >= order.total_price:
+                    if user.saldo >= order.total_price:
                         # TODO: prosess
                         order.status = 'SEARCHING_WORKER'
                         user.saldo -= order.total_price
@@ -431,24 +464,72 @@ def transaksi_mypay_view(request):
         elif kategori == 'TRANSFER MYPAY':
             no_hp_tujuan = request.POST.get('no_hp')
             nominal_transfer = int(request.POST.get('nominal_transfer', 0))
-            if Worker.objects.filter(phone=no_hp_tujuan).exists():
-                worker = Worker.objects.get(phone=no_hp_tujuan)
-                worker.saldo += nominal_transfer
-                worker.save()
+            is_worker = False
+            is_tujuan = False
 
-                user = User.objects.get(phone=request.session["user_phone"])
+            if Worker.objects.filter(phone=no_hp_tujuan).exists():
+                is_worker = True
+                is_tujuan = True
+            elif User.objects.filter(phone=no_hp_tujuan):        
+                is_worker = False
+                is_tujuan = True
+
+            if is_tujuan:
                 if nominal_transfer > 0 and user.saldo >= nominal_transfer:
+                    if is_worker:
+                        worker = Worker.objects.get(phone=no_hp_tujuan)
+                        worker.saldo += nominal_transfer
+                        worker.save()
+                    else:
+                        worker = User.objects.get(phone=no_hp_tujuan)
+                        # print(worker)
+                        worker.saldo += nominal_transfer
+                        worker.save()
+                        
                     user.saldo -= nominal_transfer
                     user.save()
-                    user = User.objects.get(phone=request.session['user_phone'])  # Atau gunakan ID jika lebih spesifik
+                    
+                    print(is_worker)
+                    print(auth_role)
+                    if is_worker and auth_role == "worker":
+                        # Buat instance transaksi
+                        transaction = Transaction(
+                            worker=worker,
+                            category="TRANSFER MYPAY",
+                            amount=nominal_transfer
+                        )
 
-                    # Buat instance transaksi
-                    transaction = Transaction(
-                        user=user,
-                        category="TRANSFER MYPAY",
-                        amount=nominal_transfer
-                    )
-
+                        transaction = Transaction(
+                            worker=user,
+                            category="TRANSFER MYPAY",
+                            amount=nominal_transfer
+                        )
+                    elif is_worker and auth_role == "user":
+                        print(user)
+                        transaction = Transaction(
+                            user=user,
+                            worker=worker,
+                            category="TRANSFER MYPAY",
+                            amount=nominal_transfer
+                        )
+                    elif not is_worker and auth_role == "worker":
+                        transaction = Transaction(
+                            user=worker,
+                            worker=user,
+                            category="TRANSFER MYPAY",
+                            amount=nominal_transfer
+                        )
+                    elif not is_worker and auth_role == "user":
+                        transaction = Transaction(
+                            user=user,
+                            category="TRANSFER MYPAY",
+                            amount=nominal_transfer
+                        )
+                        transaction = Transaction(
+                            user=worker,
+                            category="TRANSFER MYPAY",
+                            amount=nominal_transfer
+                        )
                     # Simpan transaksi ke database
                     transaction.save()
                     messages.success(request, 'Transfer Berhasil!')
@@ -462,18 +543,25 @@ def transaksi_mypay_view(request):
             nama_bank = request.POST.get('nama_bank')
             no_rekening = request.POST.get('no_rekening')
             nominal_withdrawal = int(request.POST.get('nominal_withdrawal', 0))
-            user = User.objects.get(phone=request.session["user_phone"])
             if nominal_withdrawal > 0 and user.saldo >= nominal_withdrawal:
                 user.saldo -= nominal_withdrawal
                 user.save()
-                user = User.objects.get(phone=request.session['user_phone'])  # Atau gunakan ID jika lebih spesifik
 
-                # Buat instance transaksi
-                transaction = Transaction(
-                    user=user,
-                    category="WITHDRAWAL",
-                    amount=nominal_withdrawal
-                )
+
+                if request.session['role'] == 'User':
+                    # Buat instance transaksi
+                    transaction = Transaction(
+                        user=user,
+                        category="WITHDRAWAL",
+                        amount=nominal_withdrawal
+                    )
+                else:
+                    # Buat instance transaksi
+                    transaction = Transaction(
+                        worker=user,
+                        category="WITHDRAWAL",
+                        amount=nominal_withdrawal
+                    )
 
                 # Simpan transaksi ke database
                 transaction.save()
@@ -484,16 +572,13 @@ def transaksi_mypay_view(request):
         else:
             messages.error(request, 'Kategori transaksi tidak valid.')
 
-        return redirect('my_app')
+        return redirect('/myapp/home/transaksi-user-mypay')
 
     # Data dummy untuk form
-    pengguna = None
+    pengguna = user
 
-    if User.objects.filter(phone=request.session['user_phone']).exists():
-        pengguna = User.objects.get(phone=request.session['user_phone'])
-
-    print(pengguna.name)
-
+ 
+    
     dummy_form = {
         'nama_user': pengguna.name,
         'tanggal_transaksi': datetime.datetime.now().strftime('%Y-%m-%d'),
@@ -506,8 +591,8 @@ def transaksi_mypay_view(request):
         template_name = 'user/transaksi.html'
     else:  # Pekerja
         dummy_form['kategori_transaksi'] = ['TOP UP MY PAY', 'TRANSFER MYPAY', 'WITHDRAWAL']
-        template_name = 'feat_4_red/transaksi_mypay_pekerja.html'
-
+        template_name = 'user/transaksi.html'
+    print("succcess")
     return render(request, template_name, {'form': dummy_form, 'user_type': user_type, 'orders': orders})
 
 
@@ -585,14 +670,48 @@ def view_pemesanan(request, id):
         order.save()
     return render(request, 'user/pemesanan.html', { 'service': service })
 
+def beli_diskon(request, diskon_id):
+    diskon = Discount.objects.get(id=diskon_id)
+    user = User.objects.get(phone=request.session['user_phone'])
+
+    if user.saldo < diskon.voucher_price:
+        return JsonResponse(
+            {
+                "message": "Saldo anda tidak mencukupi"
+            }
+        )
+    user.saldo -= diskon.voucher_price
+    user.save()
+
+            # Pastikan diskon belum expired
+    if diskon.expired_date and diskon.expired_date < date.today():
+        return JsonResponse({"message": "Diskon telah kedaluwarsa"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if PurchasedVoucher.objects.filter(user=user, discount=diskon).exists():
+        return JsonResponse(
+            {"message": "Voucher ini sudah pernah dibeli oleh Anda"},
+        )
+
+    purchased_voucher = PurchasedVoucher.objects.create(user=user, discount=diskon)
+        
+ 
+    print(diskon.voucher_price)
+    return JsonResponse({
+                "status": "success",
+                "message": f"Selamat! Anda berhasil membeli voucher kode {diskon.code}.",
+                "new_saldo": user.saldo,
+                "code": diskon.code,
+                "expiry_date": diskon.expired_date,
+                "quota": diskon.usage_quota
+            })
+
 def kelola_pekerjaan_worker(request):
     if 'worker_phone' not in request.session:
         return redirect('login')
     
     categories = JobCategory.objects.all()
-    return render(request, 'worker/kelola_pekerjaan.html', {'categories': categories})
-
-
+    orders = Order.objects.filter(status="SEARCHING_WORKER")
+    return render(request, 'worker/kelola_pekerjaan.html', {'categories': categories, "orders": orders})
 
 def get_subkategori(request, kategori_id):
     if 'worker_phone' not in request.session:
@@ -600,11 +719,67 @@ def get_subkategori(request, kategori_id):
     sub_job_kategoris = SubJobCategory.objects.filter(category_id=kategori_id).values('id', 'name')
     return JsonResponse(list(sub_job_kategoris), safe=False)
 
-def kelola_status_pekerjaan(request):
+def kerjakan_service(request, order_id):
     if 'worker_phone' not in request.session:
         return redirect('login')
     
-    return render(request, 'worker/kelola_status_pekerjaan.html')
+    worker = Worker.objects.get(phone=request.session['worker_phone'])
+    order = Order.objects.get(id=order_id)
+    order.worker = worker
+    order.status = "WAITING_WORKER"
+    order.save()
+
+    return redirect('kelola_status_pekerjaan')
+
+def batal_pesanan(request, order_id):
+    order = Order.objects.get(id=order_id)    
+    if order.status != "AWAITING_PAYMENT":
+        user = User.objects.get(phone=request.session['user_phone'])
+        user.saldo += order.total_price
+        user.save()
+    order.status = "CANCELED"
+    order.save()
+    return redirect('kelola_pesanan')
+
+def update_service(request, order_id):
+    order = Order.objects.get(id=order_id)  
+    print(order.status)  
+    if order.status == "WAITING_WORKER":
+        order.status = "ARRIVE_WORKER"
+    elif order.status == "ARRIVE_WORKER":
+        order.status = "IN_PROGRESS"
+    elif order.status == "IN_PROGRESS":
+        order.status = "COMPLETED"
+    order.save()
+    return redirect('kelola_status_pekerjaan')
+
+def buat_testimoni(request, order_id):
+    if "user_phone" not in request.session:
+        return redirect('login')
+
+    if request.method == "POST":
+        rating = request.POST.get('rating')
+        text = request.POST.get('text')
+
+        user = User.objects.get(phone=request.session['user_phone'])
+        order = Service.objects.get(id=order_id)
+        testi = Testimonial.objects.create(
+            user=user,
+            Service=order,
+            rating=rating,
+            text=text
+        )
+        return redirect('kelola_pesanan')
+    return render(request, 'user/buat_testimoni.html', { "order_id": order_id, "range": range(1, 6) })
+
+def kelola_status_pekerjaan(request):
+    if 'worker_phone' not in request.session:
+        return redirect('login')
+    categories = JobCategory.objects.all()
+    worker = Worker.objects.get(phone=request.session['worker_phone'])
+    orders = Order.objects.filter(worker=worker)
+        
+    return render(request, 'worker/kelola_status_pekerjaan.html', {"orders": orders})
 
 def profile_worker(request):
     if 'worker_phone' not in request.session:

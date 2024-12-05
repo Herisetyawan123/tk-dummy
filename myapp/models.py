@@ -63,7 +63,7 @@ class Service(models.Model):
 
 class Testimonial(models.Model):
     user = models.ForeignKey(User, related_name='testimonials', on_delete=models.CASCADE)  # Link to the User model
-    subcategory = models.ForeignKey(SubJobCategory, related_name='testimonials', on_delete=models.CASCADE)  # Link to SubJobCategory
+    Service = models.ForeignKey(Service, related_name='testimonials', on_delete=models.CASCADE)  # Link to SubJobCategory
     text = models.TextField()  # Field to store the testimonial text
     rating = models.PositiveIntegerField()  # Field to store the rating (1-5, for example)
 
@@ -91,7 +91,8 @@ class Worker(models.Model):
 
 
 class Transaction(models.Model):    
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="transactions", verbose_name="User")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="transactions", verbose_name="User", null=True)
+    worker = models.ForeignKey(Worker, on_delete=models.CASCADE, related_name="transactions", verbose_name="Worker", null=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Transaction Time")
     category = models.CharField(max_length=100)
     amount = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Transaction Amount")
@@ -113,8 +114,11 @@ class Order(models.Model):
         ('AWAITING_PAYMENT', 'Menunggu Pembayaran'),
         ('SEARCHING_WORKER', 'Mencari Pekerja Terdekat'),
         ('WORKER_FOUND', 'Mendapatkan Pekerja'),
+        ('WAITING_WORKER', 'Menunggu Pekerja Tiba'),
+        ('ARRIVE_WORKER', 'Pekerja Tiba'),
         ('IN_PROGRESS', 'Dikerjakan'),
         ('COMPLETED', 'Selesai'),
+        ('CANCELED', 'Dibatalkan'),
     ]
 
     user = models.ForeignKey(

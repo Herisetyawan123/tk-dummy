@@ -12,19 +12,6 @@
       <div class="navbar">
         <nav>
           <ul>
-            {% if role == "User" %}
-
-            <li><a href="{% url 'home_user' %}">Homepage</a></li>
-            <li><a href="{% url 'my_app' %}">MyPay</a></li>
-            <li>
-              <a href="{% url 'kelola_pesanan' %}">Kelola Pesanan Saya</a>
-            </li>
-            <li><a href="{% url 'daftar_diskon' %}">Diskon</a></li>
-            <li><a href="{% url 'profile' %}">Profile</a></li>
-
-            <li><a href="{% url 'logout' %}">Logout</a></li>
-
-            {% else %}
             <li><a href="{% url 'home_worker' %}">Homepage</a></li>
             <li>
               <a href="{% url 'kelola_pekerjaan_worker' %}"
@@ -39,7 +26,6 @@
             <li><a href="{% url 'my_pay_worker' %}">MyPay</a></li>
             <li><a href="{% url 'worker_profile' %}">Profile</a></li>
             <li><a href="{% url 'logout' %}">Logout</a></li>
-            {% endif %}
           </ul>
         </nav>
       </div>
