@@ -317,9 +317,11 @@ def subkategori(request, subcategory_id):
         subkategori = SubJobCategory.objects.get(id=1)
         services = subkategori.services.all()
 
-        testimonials = subkategori.services.testimonial.all()
+        # testimonials = subkategori.services.testimonial.all()
+        testimonials = None
         workers = subkategori.workers.all()
-        print(testimonials)
+        service_ids = [service.id for service in services]
+        testimonials = Testimonial.objects.filter(Service__in=services)
         return render(request, 'sub_category.html', {'subcategory': subkategori, 'services': services, 'testimonials': testimonials, 'workers': workers, "role": request.session['role']})
     except SubJobCategory.DoesNotExist:
         return render(request, '404.html', {'message': 'ID Subkategori tidak ditemukan atau tidak valid.'}, status=404)
@@ -763,12 +765,12 @@ def buat_testimoni(request, order_id):
         order = Service.objects.get(id=order_id)
         testi = Testimonial.objects.create(
             user=user,
-            service=order,
+            Service=order,
             rating=rating,
             text=text
         )
         return redirect('kelola_pesanan')
-    return render(request, 'user/buat_testimoni.html', { "order_id": order_id, "range": range(1, 11) })
+    return render(request, 'user/buat_testimoni.html', { "order_id": order_id, "range": range(1, 6) })
 
 def kelola_status_pekerjaan(request):
     if 'worker_phone' not in request.session:
