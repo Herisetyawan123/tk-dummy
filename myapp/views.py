@@ -704,11 +704,11 @@ def view_pemesanan(request, id):
         tanggal = request.POST.get("tanggal")
         amount = request.POST.get("amount")
         diskon = request.POST.get("diskon")
-        print(request.session)
+
         try:
             user = User.objects.get(phone=request.session['user_phone'])
             service = Service.objects.get(id=service_id)
-            print(service)
+
         except (User.DoesNotExist, Service.DoesNotExist) as e:
             return render(request, "error.html", {"message": str(e)})
 
@@ -719,6 +719,13 @@ def view_pemesanan(request, id):
             pass
         
         if discount != None:
+            print(discount.usage_quota)
+            if discount.usage_quota == discount.max_usage:
+                messages.error(request, 'Diskon melewati batas penggunaan')
+                return redirect(request.META.get('HTTP_REFERER', 'default_url'))
+                
+            discount.usage_quota += 1
+            discount.save()
             order = Order(
                 user=user,
                 service=service,
@@ -935,3 +942,39 @@ def update_profile(request):
         return render(request, "update_profile.html", {"role": role, "worker": worker})
     else:
         return redirect("login")
+    
+def get_voucher_and_promo(request):
+    if "user_phone" not in request.session:
+        return redirect("login")
+    
+    promo = Discount.objects.filter(voucher_price=0)
+    vouchers = Discount.objects.filter(
+        voucher_price__gt=0,
+        purchased_vouchers__user=User.objects.get(phone=request.session["user_phone"])
+    ).distinct()
+    print(vouchers)
+    promo_data = [
+        {
+            'id': p.id,
+            'code': p.code,
+            'percentage': p.percentage,
+            'avaible': p.max_usage - p.usage_quota,
+            'min_transaction': p.min_transaction
+        }
+        for p in promo
+    ]
+    
+    voucher_data = [
+        {
+            'id': p.id,
+            'code': p.code,
+            'percentage': p.percentage,
+            'avaible': p.max_usage - p.usage_quota,
+            'min_transaction': p.min_transaction
+        }
+        for p in vouchers
+    ]
+
+    data = promo_data + voucher_data
+    
+    return JsonResponse({'discount': data}, status=200)

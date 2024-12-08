@@ -30,6 +30,16 @@
       class="mt-16 min-h-screen px-4"
       style="background-color: rgba(150, 155, 74, 0.2); padding: 20px"
     >
+         <!-- Bagian Pesan -->
+         {% if messages %}
+         <div class="messages">
+             {% for message in messages %}
+                 <div class="alert alert-{{ message.tags }}">
+                     {{ message }}
+                 </div>
+             {% endfor %}
+         </div>
+     {% endif %}
       <div
         id="order-form"
         class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md"
@@ -65,6 +75,7 @@
               name="diskon"
               class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-[#969b4a]"
             />
+            <p id="text-diskon" class="text-red-500"></p>
           </div>
 
           <!-- Total Pembayaran -->
@@ -102,59 +113,98 @@
     </div>
 
     <script>
-      // Data total pembayaran (misalnya dari database)
-      const initialTotalPayment = "{{ service.amount }}"; // Rp 150.000,00
-      const discountCodes = {
-        DISKON10: 0.1, // 10% diskon
-        DISKON20: 0.2, // 20% diskon
-      };
+       async function getPromoAndVoucher() {
+            try {
+                const response = await fetch('{% url "get_voucher_and_promo" %}');
+                
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
 
-      // Mengisi tanggal pemesanan dengan tanggal hari ini
-      const orderDateInput = document.getElementById("order-date");
-      const today = new Date().toISOString().split("T")[0];
-      orderDateInput.value = today;
+                const data = await response.json();
 
-      // Mengambil elemen total pembayaran
-      const totalPaymentElement = document.getElementById("total-payment");
-      const total = document.getElementById("total");
-      const discountCodeInput = document.getElementById("discount-code");
+                return data
 
-      total.value = initialTotalPayment;
+            } catch (error) {
+                console.error('Failed to fetch data:', error);
+                return null;
+            }
+        }
 
-      // Menghitung total pembayaran awal
-      let totalPayment = initialTotalPayment;
-      totalPaymentElement.textContent = `Rp ${totalPayment.toLocaleString(
-        "id-ID"
-      )}`;
-
-      // Fungsi untuk mengupdate total pembayaran saat kode diskon dimasukkan
-      discountCodeInput.addEventListener("input", () => {
-        const discountCode = discountCodeInput.value.toUpperCase();
-        const discount = discountCodes[discountCode] || 0;
-        const discountedTotal = initialTotalPayment * (1 - discount);
-
-        totalPayment = discountedTotal;
-        totalPaymentElement.textContent = `Rp ${totalPayment.toLocaleString(
-          "id-ID"
-        )}`;
-        total.value = totalPayment;
-      });
-
-      // Handler untuk tombol 'Pesan Jasa'
-      document
-        .getElementById("submit-order")
-        .addEventListener("click", (event) => {
-          const paymentMethod = document.getElementById("payment-method").value;
-
-          if (paymentMethod === "Pilih Metode") {
-            alert("Silakan pilih metode pembayaran.");
-            return;
-          }
-
-          z;
-          // Submit form (if you want to actually submit it after handling)
-          document.getElementById("order-form").submit();
-        });
+        function getDiscount(discounts, codes){
+          console.log(discounts)
+          return discounts.filter(discount => {
+            return discount.code == codes
+          })
+        }
+      document.addEventListener("DOMContentLoaded", function () {
+        getPromoAndVoucher().then((value) => {
+          discounts = value.discount
+          console.log(discounts)
+          
+          const initialTotalPayment = "{{ service.amount }}"; // Rp 150.000,00
+          const discountCodes = {
+            DISKON10: 0.1, // 10% diskon
+            DISKON20: 0.2, // 20% diskon
+          };
+    
+          // Mengisi tanggal pemesanan dengan tanggal hari ini
+          const orderDateInput = document.getElementById("order-date");
+          const today = new Date().toISOString().split("T")[0];
+          orderDateInput.value = today;
+    
+          // Mengambil elemen total pembayaran
+          const totalPaymentElement = document.getElementById("total-payment");
+          const total = document.getElementById("total");
+          const discountCodeInput = document.getElementById("discount-code");
+    
+          total.value = initialTotalPayment;
+    
+          // Menghitung total pembayaran awal
+          let totalPayment = initialTotalPayment;
+          totalPaymentElement.textContent = `Rp ${totalPayment.toLocaleString(
+            "id-ID"
+          )}`;
+    
+          // Fungsi untuk mengupdate total pembayaran saat kode diskon dimasukkan
+          discountCodeInput.addEventListener("input", () => {
+            const discountCode = discountCodeInput.value.toUpperCase();
+            let discount = getDiscount(discounts, discountCode).length == 0 ? 0 : parseInt(getDiscount(discounts, discountCode)[0]["percentage"]) / 100
+            const textDiskon = document.getElementById("text-diskon")
+            if(discount == 0){
+              textDiskon.innerText = "Voucher tidak tersedia (tidak wajib di isi)"
+            }else{
+              textDiskon.innerText = ""
+            }
+            // const discount = discountCodes[discountCode] || 0;
+            const discountedTotal = initialTotalPayment * (1 - discount);
+    
+            totalPayment = discountedTotal;
+            totalPaymentElement.textContent = `Rp ${totalPayment.toLocaleString(
+              "id-ID"
+            )}`;
+            total.value = totalPayment;
+          });
+    
+          // Handler untuk tombol 'Pesan Jasa'
+          document
+            .getElementById("submit-order")
+            .addEventListener("click", (event) => {
+              const paymentMethod = document.getElementById("payment-method").value;
+    
+              if (paymentMethod === "Pilih Metode") {
+                alert("Silakan pilih metode pembayaran.");
+                return;
+              }
+    
+              z;
+              // Submit form (if you want to actually submit it after handling)
+              document.getElementById("order-form").submit();
+            });
+          });
+        })
+         // Data total pembayaran (misalnya dari database)
+     
     </script>
   </body>
 </html>
