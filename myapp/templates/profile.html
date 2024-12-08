@@ -58,7 +58,8 @@
       border-radius: 4px;
     }
 
-    button {
+    .button {
+      display: inline;
       padding: 10px 20px;
       border: none;
       border-radius: 4px;
@@ -68,7 +69,7 @@
       background-color: #969b4a;
     }
 
-    button:hover {
+    .button:hover {
       background-color: #646733;
     }
 
@@ -157,7 +158,7 @@
         <label>Saldo MyPay:</label>
         <span>Rp 1.000.000</span>
       </div>
-      <button>Update</button>
+      <a class="button" href="{% url 'update_profile' %}">Update</a>
     </div>
 
     {% else %}
@@ -215,7 +216,7 @@
         <label>Kategori Pekerjaan:</label>
         <span>1. Kategori jasa 1<br>2. Kategori jasa 2</span>
       </div>
-      <button>Update</button>
+      <a class="button" href="{% url 'update_profile' %}">Update</a>
     </div>
     {% endif %}
   </div>

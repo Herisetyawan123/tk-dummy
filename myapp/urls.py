@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import choose_role, register_user, register_worker, login, home_user, home_worker, logout, landing, profile, subkategori, daftar_diskon, my_pay, kelola_pesanan, transaksi_mypay_view, view_pemesanan, get_user_pending_orders, beli_diskon
-from .views import choose_role, get_subkategori, register_user, register_worker, login, home_user, home_worker, logout, landing, profile, subkategori, daftar_diskon, my_pay, kelola_pesanan, transaksi_mypay_view, view_pemesanan, get_user_pending_orders, kelola_pekerjaan_worker, get_subkategori, kelola_status_pekerjaan, profile_worker, kerjakan_service, batal_pesanan, update_service, buat_testimoni, join_service
+from .views import choose_role, get_subkategori, register_user, register_worker, login, home_user, home_worker, logout, landing, profile, subkategori, daftar_diskon, my_pay, kelola_pesanan, transaksi_mypay_view, view_pemesanan, get_user_pending_orders, kelola_pekerjaan_worker, get_subkategori, kelola_status_pekerjaan, profile_worker, kerjakan_service, batal_pesanan, update_service, buat_testimoni, join_service, update_profile
 
 urlpatterns = [
     path('', landing, name='landing'),
@@ -8,6 +8,7 @@ urlpatterns = [
     path('register/worker/', register_worker, name='register_worker'),
     path('login/', login, name='login'),
     path('choose_role/', choose_role, name='choose_role'),
+    path('update_profile/', update_profile, name='update_profile'),
     
     path('home/profile/', profile, name='profile'),
     # user

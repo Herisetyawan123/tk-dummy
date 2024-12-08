@@ -861,3 +861,54 @@ def profile_worker(request):
     if 'worker_phone' not in request.session:
         return redirect('login')
     return render(request, 'worker/profile.html')
+
+def update_profile(request):
+    role = None
+    if "user_phone" in request.session:
+        role = "user"
+        try:
+            user = User.objects.get(phone=request.session['user_phone'])
+        except User.DoesNotExist:
+            return redirect("login")
+
+        
+        if request.method == "POST":
+            
+            # Mengambil data dari form input
+            user.name = request.POST.get('name')
+            user.gender = request.POST.get('gender')
+            user.phone = request.POST.get('phone')
+            user.address = request.POST.get('address')
+            user.date = request.POST.get('date')
+
+            user.save()  # Menyimpan data ke database
+
+            messages.success(request, "Profile berhasil diperbarui!")
+            return redirect("profile")
+
+        return render(request, "update_profile.html", {"role": role, "user": user})
+    elif "worker_phone" in request.session:
+        role = "worker"
+        try:
+            worker = Worker.objects.get(phone=request.session['worker_phone'])
+        except Worker.DoesNotExist:
+            return redirect("login")
+
+        if request.method == "POST":
+            worker.name = request.POST.get('name')
+            worker.gender = request.POST.get('gender')
+            worker.phone = request.POST.get('phone')
+            worker.address = request.POST.get('address')
+            worker.bank_name = request.POST.get('bank_name')
+            worker.account_number = request.POST.get('account_number')
+            worker.npwp = request.POST.get('npwp')
+            worker.photo_url = request.POST.get('url_photo')
+
+            worker.save()  # Menyimpan data ke database
+
+            messages.success(request, "Profile pekerja berhasil diperbarui!")
+            return redirect("profile")
+
+        return render(request, "update_profile.html", {"role": role, "worker": worker})
+    else:
+        return redirect("login")

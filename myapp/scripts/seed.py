@@ -132,7 +132,7 @@ def run():
         {
             'name': 'Heri Setyawan',
             'password': '083853797950',
-            'gender': 'Perempuan',
+            'gender': 'L',
             'date': '1990-11-05',
             'phone': '083853797950',
             'saldo': 750000,
@@ -141,7 +141,7 @@ def run():
         {
             'name': 'Savitri',
             'password': 'passwDD',
-            'gender': 'Perempuan',
+            'gender': 'P',
             'date': '1990-12-02',
             'phone': '081111111112',
             'saldo': 750000,
@@ -150,7 +150,7 @@ def run():
         {
             'name': 'Kinar',
             'password': 'paSSword',
-            'gender': 'Perempuan',
+            'gender': 'P',
             'date': '1997-04-04',
             'phone': '081111111114',
             'saldo': 250000,
@@ -159,7 +159,7 @@ def run():
         {
             'name': 'Nawa',
             'password': 'passwWORd',
-            'gender': 'Perempuan',
+            'gender': 'P',
             'date': '2001-06-06',
             'phone': '081111111117',
             'saldo': 400000,
@@ -168,7 +168,7 @@ def run():
         {
             'name': 'Adel',
             'password': 'passTword',
-            'gender': 'Perempuan',
+            'gender': 'P',
             'date': '2006-08-08',
             'phone': '081111111119',
             'saldo': 800000,
@@ -177,7 +177,7 @@ def run():
         {
             'name': 'Cia',
             'password': 'passwordPP',
-            'gender': 'Perempuan',
+            'gender': 'P',
             'date': '2008-10-10',
             'phone': '081111111110',
             'saldo': 50000,
