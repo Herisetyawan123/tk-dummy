@@ -13,32 +13,6 @@ class User(models.Model):
     def __str__(self):
         return self.name
 
-# class User(models.Model):
-#     name = models.CharField(max_length=100)
-#     password = models.CharField(max_length=100)
-#     gender = models.CharField(max_length=10)
-#     phone = models.CharField(max_length=15)
-#     address = models.TextField()
-
-#     def __str__(self):
-#         return self.name
-    
-#     def save(self, *args, **kwargs):
-#         # Logic custom save
-#         super().save(*args, **kwargs)
-
-#     @classmethod
-#     def user_exists(cls, phone):
-#         return cls.objects.filter(phone=phone).exists()
-
-#     @classmethod
-#     def add_user(cls, data):
-#         cls.objects.create(**data)
-
-#     @classmethod
-#     def get_user_by_phone_and_password(cls, phone, password):
-#         return cls.objects.filter(phone=phone, password=password).first()
-
 class JobCategory(models.Model):
     name = models.CharField(max_length=255, unique=True)  # Nama kategori pekerjaan
     description = models.TextField(blank=True, null=True)  # Deskripsi opsional
@@ -98,6 +72,10 @@ class Transaction(models.Model):
     worker = models.ForeignKey(Worker, on_delete=models.CASCADE, related_name="transactions", verbose_name="Worker", null=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Transaction Time")
     category = models.CharField(max_length=100)
+    type = models.CharField(max_length=20, choices=[
+        ("in", "UANG MASUK"),
+        ("out", "UANG KELUAR"),
+    ], default='in', verbose_name="Type Transaction")
     amount = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Transaction Amount")
 
 class Discount(models.Model):

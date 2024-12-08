@@ -242,6 +242,19 @@ def run():
             'bank_name': 'Bank EEE',
             'npwp': 'NPWP5',
             'photo_url': 'https://example.com/foto5.jpg'
+        },
+        {
+            'name': 'Developer',
+            'password': '08888888888',
+            'gender': 'L',
+            'phone': '08888888888',
+            'dob': datetime(2007, 9, 9),
+            'saldo': 150000,
+            'address': 'Jl. Anggur No. 9',
+            'account_number': '1111111115',
+            'bank_name': 'Bank EEE',
+            'npwp': 'NPWP52',
+            'photo_url': 'https://example.com/foto5.jpg'
         }
     ]
 

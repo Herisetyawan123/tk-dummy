@@ -327,7 +327,7 @@ def subkategori(request, subcategory_id):
     
     # Pastikan ID subkategori ada di data
     try:
-        subkategori = SubJobCategory.objects.get(id=1)
+        subkategori = SubJobCategory.objects.get(id=subcategory_id)
         services = subkategori.services.all()
 
         # testimonials = subkategori.services.testimonial.all()
@@ -424,19 +424,25 @@ def transaksi_mypay_view(request):
                     transaction = Transaction(
                         user=user,
                         category="TOPUP",
-                        amount=nominal
+                        amount=nominal,
+                        type="in"
                     )
                 else:
                     # Buat instance transaksi
                     transaction = Transaction(
                         worker=user,
                         category="TOPUP",
-                        amount=nominal
+                        amount=nominal,
+                        type="in"
                     )
 
                 # Simpan transaksi ke database
                 transaction.save()
                 messages.success(request, 'Top Up Berhasil!')
+                if auth_role == "worker":
+                    return redirect('my_pay_worker')
+                else:
+                    return redirect('my_pay_worker')
             else:
                 messages.error(request, 'Nominal tidak valid.')
 
@@ -444,7 +450,7 @@ def transaksi_mypay_view(request):
             if user_type == 'User':
                 pesanan_jasa = request.POST.get('pesanan_jasa')
                 # Ekstrak jumlah dari pesanan_jasa (misalnya, "Jasa 1 - Rp 200.000")
-                print(pesanan_jasa)
+
                 try:
                   
                     order = Order.objects.get(id=pesanan_jasa)
@@ -456,7 +462,8 @@ def transaksi_mypay_view(request):
                         transaction = Transaction(
                             user=user,
                             category="MEMBAYAR TRANSAKSI",
-                            amount=order.total_price
+                            amount=order.total_price,
+                            type="out"
                         )
 
 
@@ -466,6 +473,10 @@ def transaksi_mypay_view(request):
                         transaction.save()
                         print("success")
                         messages.success(request, 'Pembayaran Berhasil!')
+                        if auth_role == "worker":
+                            return redirect('my_pay_worker')
+                        else:
+                            return redirect('my_pay_worker')
                     else:
                         messages.error(request, 'Saldo tidak mencukupi.')
                 except (IndexError, ValueError):
@@ -500,51 +511,77 @@ def transaksi_mypay_view(request):
                         
                     user.saldo -= nominal_transfer
                     user.save()
-                    
-                    print(is_worker)
-                    print(auth_role)
                     if is_worker and auth_role == "worker":
+                        print("oke")
                         # Buat instance transaksi
                         transaction = Transaction(
                             worker=worker,
                             category="TRANSFER MYPAY",
-                            amount=nominal_transfer
+                            amount=nominal_transfer,
+                            type="in"
                         )
+                        transaction.save()
 
                         transaction = Transaction(
                             worker=user,
                             category="TRANSFER MYPAY",
-                            amount=nominal_transfer
+                            amount=nominal_transfer,
+                            type="out"
                         )
+                        transaction.save()
                     elif is_worker and auth_role == "user":
-                        print(user)
+                     
                         transaction = Transaction(
                             user=user,
+                            category="TRANSFER MYPAY",
+                            amount=nominal_transfer,
+                            type="out"
+                        )
+                        transaction.save()
+                        transaction = Transaction(
                             worker=worker,
                             category="TRANSFER MYPAY",
-                            amount=nominal_transfer
+                            amount=nominal_transfer,
+                            type="in"
                         )
+                        transaction.save()
                     elif not is_worker and auth_role == "worker":
                         transaction = Transaction(
                             user=worker,
+                            type="out",
+                            category="TRANSFER MYPAY",
+                            amount=nominal_transfer,
+                        )
+
+                        transaction.save()
+                        transaction = Transaction(
+                            type="in",
                             worker=user,
                             category="TRANSFER MYPAY",
-                            amount=nominal_transfer
+                            amount=nominal_transfer,
                         )
+                        transaction.save()
                     elif not is_worker and auth_role == "user":
                         transaction = Transaction(
                             user=user,
                             category="TRANSFER MYPAY",
-                            amount=nominal_transfer
+                            amount=nominal_transfer,
+                            type="out"
                         )
+                        transaction.save()
                         transaction = Transaction(
                             user=worker,
                             category="TRANSFER MYPAY",
-                            amount=nominal_transfer
+                            amount=nominal_transfer,
+                            type="in"
                         )
+                        transaction.save()
                     # Simpan transaksi ke database
-                    transaction.save()
                     messages.success(request, 'Transfer Berhasil!')
+                    if auth_role == "worker":
+                        return redirect('my_pay_worker')
+                    else:
+                        return redirect('my_pay_worker')
                 else:
                     messages.error(request, 'Jumlah transfer tidak valid atau saldo tidak mencukupi.')
             else:
@@ -565,19 +602,25 @@ def transaksi_mypay_view(request):
                     transaction = Transaction(
                         user=user,
                         category="WITHDRAWAL",
-                        amount=nominal_withdrawal
+                        amount=nominal_withdrawal,
+                        type="out"
                     )
                 else:
                     # Buat instance transaksi
                     transaction = Transaction(
                         worker=user,
                         category="WITHDRAWAL",
-                        amount=nominal_withdrawal
+                        amount=nominal_withdrawal,
+                        type="out"
                     )
 
                 # Simpan transaksi ke database
                 transaction.save()
                 messages.success(request, 'Withdrawal Berhasil!')
+                if auth_role == "worker":
+                    return redirect('my_pay_worker')
+                else:
+                    return redirect('my_pay_worker')
             else:
                 messages.error(request, 'Jumlah withdrawal tidak valid atau saldo tidak mencukupi.')
 
