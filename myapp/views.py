@@ -421,6 +421,7 @@ def transaksi_mypay_view(request):
 
     user = None
     orders = None
+    print(orders)
     if 'user_phone' in request.session:
         try:
             user_order = User.objects.get(phone=request.session['user_phone'])
@@ -516,7 +517,7 @@ def transaksi_mypay_view(request):
             nominal_transfer = int(request.POST.get('nominal_transfer', 0))
             is_worker = False
             is_tujuan = False
-
+     
             if Worker.objects.filter(phone=no_hp_tujuan).exists():
                 is_worker = True
                 is_tujuan = True
@@ -524,6 +525,7 @@ def transaksi_mypay_view(request):
                 is_worker = False
                 is_tujuan = True
 
+      
             if is_tujuan:
                 if nominal_transfer > 0 and user.saldo >= nominal_transfer:
                     if is_worker:
@@ -538,8 +540,8 @@ def transaksi_mypay_view(request):
                         
                     user.saldo -= nominal_transfer
                     user.save()
+                
                     if is_worker and auth_role == "worker":
-                        print("oke")
                         # Buat instance transaksi
                         transaction = Transaction(
                             worker=worker,
@@ -575,14 +577,14 @@ def transaksi_mypay_view(request):
                     elif not is_worker and auth_role == "worker":
                         transaction = Transaction(
                             user=worker,
-                            type="out",
+                            type="in",
                             category="TRANSFER MYPAY",
                             amount=nominal_transfer,
                         )
 
                         transaction.save()
                         transaction = Transaction(
-                            type="in",
+                            type="out",
                             worker=user,
                             category="TRANSFER MYPAY",
                             amount=nominal_transfer,

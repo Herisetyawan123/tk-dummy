@@ -1,6 +1,6 @@
 from django import forms
 from .database import workers_db
-from .models import Worker
+from .models import Worker, User
 
 class UserRegistrationForm(forms.Form):
     name = forms.CharField(max_length=100, required=True)
@@ -9,7 +9,14 @@ class UserRegistrationForm(forms.Form):
     phone = forms.CharField(max_length=15, required=True)
     dob = forms.DateField(widget=forms.SelectDateWidget(years=range(1900, 2023)), required=True)
     address = forms.CharField(widget=forms.Textarea, required=True)
-
+    
+    # Validasi di level form
+    def clean_phone(self):
+        phone = self.cleaned_data['phone']
+        if User.objects.filter(phone=phone).exists():
+            raise forms.ValidationError('Nomor HP sudah digunakan.')
+        return phone
+    
 class WorkerRegistrationForm(forms.Form):
     name = forms.CharField(max_length=100)
     password = forms.CharField(widget=forms.PasswordInput)
