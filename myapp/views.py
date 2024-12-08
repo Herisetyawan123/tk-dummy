@@ -933,6 +933,7 @@ def update_profile(request):
             worker.account_number = request.POST.get('account_number')
             worker.npwp = request.POST.get('npwp')
             worker.photo_url = request.POST.get('url_photo')
+            worker.dob = request.POST.get('dob')
 
             worker.save()  # Menyimpan data ke database
 
