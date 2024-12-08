@@ -130,6 +130,15 @@ def run():
     # Daftar pengguna
     users = [
         {
+            'name': 'Heri Setyawan',
+            'password': '083853797950',
+            'gender': 'Perempuan',
+            'date': '1990-11-05',
+            'phone': '083853797950',
+            'saldo': 750000,
+            'address': 'Jl. Mangga No. 2'
+        },
+        {
             'name': 'Savitri',
             'password': 'passwDD',
             'gender': 'Perempuan',

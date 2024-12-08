@@ -1,28 +1,30 @@
 {% extends 'base.html' %} {% load static %} {% block content %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Status Pekerjaan</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="{% static 'css/home.css' %}" />
-  </head>
-  <body>
-    <div class="navbar-container">
-      <div class="navbar">
-        <nav>
-          <ul>
-            <li><a href="{% url 'home_worker' %}">Homepage</a></li>
-            <li><a href="{% url 'kelola_pekerjaan_worker' %}">Kelola Pekerjaan Saya</a></li>
-            <li><a href="{% url 'kelola_status_pekerjaan' %}">Kelola Status Pekerjaan</a></li>
-            <li><a href="{% url 'my_pay_worker' %}">MyPay</a></li>
+</head>
 
-            <li><a href="{% url 'worker_profile' %}">Profile</a></li>
-            <li><a href="{% url 'logout' %}">Logout</a></li>
-          </ul>
-        </nav>
-      </div>
+<body>
+    <div class="navbar-container">
+        <div class="navbar">
+            <nav>
+                <ul>
+                    <li><a href="{% url 'home_worker' %}">Homepage</a></li>
+                    <li><a href="{% url 'kelola_pekerjaan_worker' %}">Kelola Pekerjaan Saya</a></li>
+                    <li><a href="{% url 'kelola_status_pekerjaan' %}">Kelola Status Pekerjaan</a></li>
+                    <li><a href="{% url 'my_pay_worker' %}">MyPay</a></li>
+
+                    <li><a href="{% url 'worker_profile' %}">Profile</a></li>
+                    <li><a href="{% url 'logout' %}">Logout</a></li>
+                </ul>
+            </nav>
+        </div>
     </div>
 
     <h1 class="text-2xl font-bold text-center my-6">Daftar Pekerjaan Anda</h1>
@@ -31,23 +33,20 @@
         <!-- Filter dan Search -->
         <form method="GET" class="flex items-center gap-4 mb-6">
             <!-- Filter Subkategori -->
-            <input
-            type="text"
-            id="nama-jasa"
-            placeholder="Nama Jasa"
-            class="w-full md:w-1/3 border border-gray-300 rounded-md"
-          />
+            <input type="text" id="nama-jasa" placeholder="Nama Jasa"
+                class="w-full md:w-1/3 border border-gray-300 rounded-md" />
             <!-- Filter Status -->
-            <select id="status-pesanan" name="status-pesanan" class="w-1/4 p-2 py-2.5 border rounded-md focus:outline-none focus:ring focus:border-[#969b4a]">
+            <select id="status-pesanan" name="status-pesanan"
+                class="w-1/4 p-2 py-2.5 border rounded-md focus:outline-none focus:ring focus:border-[#969b4a]">
                 <option value="">Status Pesanan</option>
             </select>
-    
+
             <!-- Tombol Submit -->
             <button type="submit" class="px-4 py-2 text-white bg-[#969b4a] rounded-md hover:bg-[#7a7e37]">
                 Search
             </button>
         </form>
-    
+
         <!-- Tabel Pesanan -->
         <div class="bg-white p-4 rounded-lg shadow-md">
             <div class="overflow-x-auto">
@@ -63,33 +62,39 @@
                         </tr>
                     </thead>
                     <tbody>
-                      {% for order in orders %}
-                      <tr class="hover-effect">
-                        <td class="p-4 text-center border-t">
-                            {{ order.service.sub_category.name }}
-                        </td>
-                        <td class="p-4 text-center border-t">{{ order.user.name }}</td>
-                        <td class="p-4 text-center border-t">20-12-2023</td>
+                        {% for order in orders %}
+                        <tr class="hover-effect">
+                            <td class="p-4 text-center border-t">
+                                {{ order.service.sub_category.name }}
+                            </td>
+                            <td class="p-4 text-center border-t">{{ order.user.name }}</td>
+                            <td class="p-4 text-center border-t">20-12-2023</td>
 
-                        <td class="p-4 text-center border-t">{{ order.service.name }}</td>
-                        <td class="p-4 text-center border-t">Rp {{ order.total_price }}</td>
-                        <td class=""><a href="{% url 'update_service' order.id %}" class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">
-                            {% if order.status == 'ARRIVE_WORKER' %}
-                                Melakukan Pekerjaan
-                            {% elif order.status == 'IN_PROGRESS' %}
-                                Selesai Pekerjaan
-                            {% elif order.status == 'COMPLETED' %}
-                                Selesai
-                            {% elif order.status == 'WAITING_WORKER' %}
-                                Tiba Dilokasi
-                            {% endif %}
-                        </a></td>
-                    </tr>
-                    {% empty %}
+                            <td class="p-4 text-center border-t">{{ order.service.name }}</td>
+                            <td class="p-4 text-center border-t">Rp {{ order.total_price }}</td>
+                            <td class="">
+                                {% if order.status != 'COMPLETED' %}
+
+                                <a href="{% url 'update_service' order.id %}"
+                                    class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">
+                                    {% if order.status == 'ARRIVE_WORKER' %}
+                                    Melakukan Pekerjaan
+                                    {% elif order.status == 'IN_PROGRESS' %}
+                                    Selesai Pekerjaan
+                                    {% elif order.status == 'WAITING_WORKER' %}
+                                    Tiba Dilokasi
+                                    {% endif %}
+                                </a>
+                                {% else %}
+                                <span class="bg-white">Selesai</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
                         <tr>
                             <td colspan="6" class="p-4 text-center text-gray-500">Belum ada pesanan yang ditemukan.</td>
                         </tr>
-                    {% endfor %}
+                        {% endfor %}
                     </tbody>
                     <!-- <tbody>
                         {% for order in orders %}
@@ -132,11 +137,11 @@
                 </table>
             </div>
         </div>
-    
-        </div>
-      </div>
 
-      <!-- <script>
+    </div>
+    </div>
+
+    <!-- <script>
         $(document).ready(function() {
             $('#kategori').change(function() {
                 let kategoriId = $(this).val();
@@ -157,7 +162,8 @@
             });
         });
     </script> -->
-  </body>
+</body>
+
 </html>
 
 {% endblock content %}

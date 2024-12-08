@@ -12,7 +12,7 @@
     <div class="navbar">
       <nav>
         <ul>
-          {% if role == "user" %}
+          {% if role == "User" %}
           <li><a href="{% url 'home_user' %}">Homepage</a></li>
           <li><a href="{% url 'my_app' %}">MyPay</a></li>
           <li>
@@ -79,10 +79,12 @@
       </div>
     </div>
     <div class="flex justify-end mb-4">
+      {% if role == "worker" %}
       <button id="joinButton"
         class="btn-order px-4 py-2 bg-[#969b4a] text-white rounded-lg hover:bg-[#646733] focus:outline-none">
         Bergabung untuk Bekerja
       </button>
+      {% endif %}
     </div>
     <!-- Testimonial Box -->
     <div class="testimonial-box mb-6 p-4 bg-white border border-[#c8cc7d] rounded-md shadow-sm">

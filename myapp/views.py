@@ -723,6 +723,7 @@ def view_pemesanan(request, id):
 
         # Simpan data ke database
         order.save()
+        return redirect('kelola_pesanan')
     return render(request, 'user/pemesanan.html', { 'service': service })
 
 def beli_diskon(request, diskon_id):
@@ -792,6 +793,13 @@ def batal_pesanan(request, order_id):
         user = User.objects.get(phone=request.session['user_phone'])
         user.saldo += order.total_price
         user.save()
+        transaction = Transaction(
+            user=user,
+            category="REFUND CANCEL",
+            amount= order.total_price,
+            type="in"
+        )
+        transaction.save()
     order.status = "CANCELED"
     order.save()
     return redirect('kelola_pesanan')
@@ -805,9 +813,17 @@ def update_service(request, order_id):
         order.status = "IN_PROGRESS"
     elif order.status == "IN_PROGRESS":
         order.status = "COMPLETED"
-        worker = Worker.objects.get(id=order_id)
+        worker = Worker.objects.get(id=order.worker.id)
         worker.saldo += order.total_price
         worker.save()
+        transaction = Transaction(
+            worker=worker,
+            category="PEMBAYARAN JASA",
+            amount= order.total_price,
+            type="in"
+        )
+        transaction.save()
+        print("selesai", order.worker.id)
     order.save()
     return redirect('kelola_status_pekerjaan')
 
@@ -823,7 +839,7 @@ def buat_testimoni(request, order_id):
         order = Service.objects.get(id=order_id)
         testi = Testimonial.objects.create(
             user=user,
-            Service=order,
+            service=order,
             rating=rating,
             text=text
         )
