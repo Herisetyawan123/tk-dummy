@@ -63,6 +63,21 @@ def register_worker(request):
             npwp = form.cleaned_data['npwp']
             photo_url = form.cleaned_data['photo_url']
             bank_name = form.cleaned_data['bank_name']
+
+            # Validasi nomor HP sudah ada
+            if Worker.objects.filter(phone=phone).exists():
+                form.add_error('phone', 'Nomor HP sudah digunakan.')
+                return render(request, 'register_worker.html', {'form': form})
+
+            # Validasi kombinasi nama bank dan nomor rekening tidak duplikat
+            if Worker.objects.filter(bank_name=bank_name, account_number=account_number).exists():
+                form.add_error('account_number', 'Nomor rekening sudah digunakan untuk bank yang sama.')
+                return render(request, 'register_worker.html', {'form': form})
+
+            # Validasi nomor NPWP tidak duplikat
+            if Worker.objects.filter(npwp=npwp).exists():
+                form.add_error('npwp', 'Nomor NPWP sudah digunakan.')
+                return render(request, 'register_worker.html', {'form': form})
             
             try:
                 Worker.objects.create(
@@ -329,7 +344,7 @@ subcategory_data = {
 def subkategori(request, subcategory_id):
     # Gunakan subcategory_id langsung dari parameter
     subkategori_id = subcategory_id
-    
+
     
     # Pastikan ID subkategori ada di data
     try:
@@ -341,7 +356,9 @@ def subkategori(request, subcategory_id):
         workers = subkategori.workers.all()
         service_ids = [service.id for service in services]
         testimonials = Testimonial.objects.filter(service__in=services)
-        is_join = Worker.objects.get(phone=request.session["worker_phone"]).sub_categories.filter(id=subkategori.id).exists()
+        is_join = False
+        if "worker_phone" in request.session:
+            is_join = Worker.objects.get(phone=request.session["worker_phone"]).sub_categories.filter(id=subkategori.id).exists()
         # print(is_join)
         return render(request, 'sub_category.html', {'subcategory': subkategori, 'services': services, 'testimonials': testimonials, 'workers': workers, "role": request.session['role'], "is_join": is_join})
     except SubJobCategory.DoesNotExist:

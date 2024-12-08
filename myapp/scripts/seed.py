@@ -196,7 +196,7 @@ def run():
             'saldo': 1000000,
             'address': 'Jl. Pisang No. 5',
             'account_number': '1111111111',
-            'bank_name': 'Bank AAA',
+            'bank_name': 'gopay',
             'npwp': 'NPWP1',
             'photo_url': 'https://example.com/foto1.jpg'
         },
@@ -209,7 +209,7 @@ def run():
             'saldo': 500000,
             'address': 'Jl. Rambutan No. 1',
             'account_number': '1111111112',
-            'bank_name': 'Bank BBB',
+            'bank_name': 'ovo',
             'npwp': 'NPWP2',
             'photo_url': 'https://example.com/foto2.jpg'
         },
@@ -222,7 +222,7 @@ def run():
             'saldo': 350000,
             'address': 'Jl. Nanas No. 7',
             'account_number': '1111111113',
-            'bank_name': 'Bank CCC',
+            'bank_name': 'bca',
             'npwp': 'NPWP3',
             'photo_url': 'https://example.com/foto3.jpg'
         },
@@ -235,7 +235,7 @@ def run():
             'saldo': 300000,
             'address': 'Jl. Jeruk No. 3',
             'account_number': '1111111114',
-            'bank_name': 'Bank DDD',
+            'bank_name': 'bni',
             'npwp': 'NPWP4',
             'photo_url': 'https://example.com/foto4.jpg'
         },
@@ -248,7 +248,7 @@ def run():
             'saldo': 150000,
             'address': 'Jl. Anggur No. 9',
             'account_number': '1111111115',
-            'bank_name': 'Bank EEE',
+            'bank_name': 'mandiri',
             'npwp': 'NPWP5',
             'photo_url': 'https://example.com/foto5.jpg'
         },
@@ -260,8 +260,8 @@ def run():
             'dob': datetime(2007, 9, 9),
             'saldo': 150000,
             'address': 'Jl. Anggur No. 9',
-            'account_number': '1111111115',
-            'bank_name': 'Bank EEE',
+            'account_number': '111111199',
+            'bank_name': 'bni',
             'npwp': 'NPWP52',
             'photo_url': 'https://example.com/foto5.jpg'
         }

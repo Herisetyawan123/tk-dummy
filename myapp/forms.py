@@ -1,5 +1,6 @@
 from django import forms
 from .database import workers_db
+from .models import Worker
 
 class UserRegistrationForm(forms.Form):
     name = forms.CharField(max_length=100, required=True)
@@ -26,3 +27,22 @@ class WorkerRegistrationForm(forms.Form):
         ('bni', 'Virtual Account BNI'),
         ('mandiri', 'Virtual Account Mandiri'),
     ])
+    # Validasi di level form
+    def clean_phone(self):
+        phone = self.cleaned_data['phone']
+        if Worker.objects.filter(phone=phone).exists():
+            raise forms.ValidationError('Nomor HP sudah digunakan.')
+        return phone
+
+    def clean_account_number(self):
+        bank_name = self.cleaned_data.get('bank_name')
+        account_number = self.cleaned_data.get('account_number')
+        if Worker.objects.filter(bank_name=bank_name, account_number=account_number).exists():
+            raise forms.ValidationError('Bank dan nomor rekening sudah terdaftar.')
+        return account_number
+
+    def clean_npwp(self):
+        npwp = self.cleaned_data['npwp']
+        if Worker.objects.filter(npwp=npwp).exists():
+            raise forms.ValidationError('Nomor NPWP sudah digunakan.')
+        return npwp
