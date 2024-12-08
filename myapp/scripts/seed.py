@@ -5,112 +5,245 @@ from datetime import date, timedelta
 import random
 from decimal import Decimal
 
+from datetime import datetime
+
+
+
 def run():
     # Data untuk di-seed
     categories_data = [
+    {
+        'name': 'Home Cleaning',
+        'subcategories': [
+            {
+                'name': 'Daily Cleaning',
+                'services': [
+                    {'name': 'Daily Cleaning', 'description': 'Pembersihan harian rumah', 'amount': 100000},
+                    {'name': 'Daily Cleaning', 'description': 'Pembersihan harian rumah', 'amount': 180000},
+                    {'name': 'Daily Cleaning', 'description': 'Pembersihan harian rumah', 'amount': 200000},
+                ]
+            },
+            {
+                'name': 'Setrika',
+                'services': [
+                    {'name': 'Setrika', 'description': 'Layanan setrika pakaian', 'amount': 80000},
+                    {'name': 'Setrika', 'description': 'Layanan setrika pakaian', 'amount': 150000},
+                    {'name': 'Setrika', 'description': 'Layanan setrika pakaian', 'amount': 160000},
+                ]
+            },
+            {
+                'name': 'Pembersihan Dapur',
+                'services': [
+                    {'name': 'Pembersihan Dapur', 'description': 'Membersihkan dapur dan kulkas', 'amount': 120000},
+                    {'name': 'Pembersihan Dapur', 'description': 'Membersihkan dapur dan kulkas', 'amount': 200000},
+                    {'name': 'Pembersihan Dapur', 'description': 'Membersihkan dapur dan kulkas', 'amount': 220000},
+                ]
+            },
+            {
+                'name': 'Kombo Cleaning + Setrika',
+                'services': [
+                    {'name': 'Kombo Cleaning + Setrika', 'description': 'Paket kombo pembersihan harian dan setrika', 'amount': 180000},
+                    {'name': 'Kombo Cleaning + Setrika', 'description': 'Paket kombo pembersihan harian dan setrika', 'amount': 300000},
+                    {'name': 'Kombo Cleaning + Setrika', 'description': 'Paket kombo pembersihan harian dan setrika', 'amount': 320000},
+                ]
+            },
+            {
+                'name': 'Kombo Cleaning + Dapur',
+                'services': [
+                    {'name': 'Kombo Cleaning + Dapur', 'description': 'Paket kombo pembersihan harian dan dapur', 'amount': 200000},
+                    {'name': 'Kombo Cleaning + Dapur', 'description': 'Paket kombo pembersihan harian dan dapur', 'amount': 350000},
+                    {'name': 'Kombo Cleaning + Dapur', 'description': 'Paket kombo pembersihan harian dan dapur', 'amount': 380000},
+                ]
+            },
+            {
+                'name': 'Full Deep Cleaning',
+                'services': [
+                    {'name': 'Full Deep Cleaning', 'description': 'Pembersihan mendalam seluruh rumah', 'amount': 250000},
+                    {'name': 'Full Deep Cleaning', 'description': 'Pembersihan mendalam seluruh rumah', 'amount': 400000},
+                    {'name': 'Full Deep Cleaning', 'description': 'Pembersihan mendalam seluruh rumah', 'amount': 420000},
+                ]
+            },
+        ]
+    },
+    {
+        'name': 'Deep Cleaning',
+        'subcategories': [
+            {
+                'name': 'Full Deep Cleaning',
+                'services': [
+                    {'name': 'Full Deep Cleaning', 'description': 'Pembersihan mendalam seluruh rumah', 'amount': 250000},
+                    {'name': 'Full Deep Cleaning', 'description': 'Pembersihan mendalam seluruh rumah', 'amount': 400000},
+                    {'name': 'Full Deep Cleaning', 'description': 'Pembersihan mendalam seluruh rumah', 'amount': 420000},
+                ]
+            },
+        ]
+    },
+    {
+        'name': 'Service AC',
+        'subcategories': [
+            {
+                'name': 'Cuci AC',
+                'services': [
+                    {'name': 'Cuci AC', 'description': 'Servis dan cuci AC', 'amount': 150000},
+                    {'name': 'Cuci AC', 'description': 'Servis dan cuci AC', 'amount': 250000},
+                    {'name': 'Cuci AC', 'description': 'Servis dan cuci AC', 'amount': 270000},
+                ]
+            },
+        ]
+    },
+    {
+        'name': 'Massage',
+        'subcategories': [
+            {
+                'name': 'Pijat Refleksi',
+                'services': [
+                    {'name': 'Pijat Refleksi', 'description': 'Layanan pijat refleksi', 'amount': 120000},
+                    {'name': 'Pijat Refleksi', 'description': 'Layanan pijat refleksi', 'amount': 220000},
+                    {'name': 'Pijat Refleksi', 'description': 'Layanan pijat refleksi', 'amount': 240000},
+                ]
+            },
+        ]
+    },
+    {
+        'name': 'Hair Care',
+        'subcategories': [
+            {
+                'name': 'Hair Treatment',
+                'services': [
+                    {'name': 'Hair Treatment', 'description': 'Perawatan rambut', 'amount': 100000},
+                    {'name': 'Hair Treatment', 'description': 'Perawatan rambut', 'amount': 180000},
+                    {'name': 'Hair Treatment', 'description': 'Perawatan rambut', 'amount': 190000},
+                ]
+            },
+            {
+                'name': 'Hair Spa',
+                'services': [
+                    {'name': 'Hair Spa', 'description': 'Spa untuk rambut', 'amount': 120000},
+                    {'name': 'Hair Spa', 'description': 'Spa untuk rambut', 'amount': 200000},
+                    {'name': 'Hair Spa', 'description': 'Spa untuk rambut', 'amount': 210000},
+                ]
+            },
+        ]
+    },
+]
+
+    # Daftar pengguna
+    users = [
         {
-            'name': 'IT',
-            'subcategories': [
-                {
-                    'name': 'Desain Grafis',
-                    'services': [
-                        {'name': 'Desain Logo', 'description': 'Membuat logo profesional', 'amount': 150000},
-                        {'name': 'Desain Poster', 'description': 'Membuat poster kreatif', 'amount': 150000},
-                    ]
-                },
-                {
-                    'name': 'Pengembangan Web',
-                    'services': [
-                        {'name': 'Frontend Development', 'description': 'Pengembangan tampilan depan website', 'amount': 150000},
-                        {'name': 'Backend Development', 'description': 'Pengembangan server dan database', 'amount': 150000},
-                    ]
-                },
-                {
-                    'name': 'Data Science',
-                    'services': [
-                        {'name': 'Analisis Data', 'description': 'Menganalisis data untuk mengambil keputusan', 'amount': 150000},
-                        {'name': 'Machine Learning', 'description': 'Membangun model machine learning', 'amount': 150000},
-                    ]
-                },
-            ]
+            'name': 'Savitri',
+            'password': 'passwDD',
+            'gender': 'Perempuan',
+            'date': '1990-12-02',
+            'phone': '081111111112',
+            'saldo': 750000,
+            'address': 'Jl. Mangga No. 2'
         },
         {
-            'name': 'Kesehatan',
-            'subcategories': [
-                {
-                    'name': 'Dokter Umum',
-                    'services': [
-                        {'name': 'Pemeriksaan Kesehatan', 'description': 'Pemeriksaan kesehatan umum', 'amount': 150000},
-                        {'name': 'Rujukan Spesialis', 'description': 'Memberikan rujukan ke dokter spesialis', 'amount': 150000},
-                    ]
-                },
-                {
-                    'name': 'Perawat',
-                    'services': [
-                        {'name': 'Perawatan Pasien', 'description': 'Memberikan perawatan kepada pasien', 'amount': 150000},
-                        {'name': 'Pemberian Obat', 'description': 'Memberikan obat sesuai resep', 'amount': 150000},
-                    ]
-                },
-                {
-                    'name': 'Fisioterapi',
-                    'services': [
-                        {'name': 'Rehabilitasi Fisik', 'description': 'Membantu pemulihan fisik pasien', 'amount': 150000},
-                        {'name': 'Latihan Fisioterapi', 'description': 'Memberikan latihan untuk pasien', 'amount': 150000},
-                    ]
-                },
-            ]
+            'name': 'Kinar',
+            'password': 'paSSword',
+            'gender': 'Perempuan',
+            'date': '1997-04-04',
+            'phone': '081111111114',
+            'saldo': 250000,
+            'address': 'Jl. Apel No. 4'
         },
         {
-            'name': 'Konstruksi',
-            'subcategories': [
-                {
-                    'name': 'Arsitek',
-                    'services': [
-                        {'name': 'Desain Bangunan', 'description': 'Merancang bangunan yang fungsional', 'amount': 150000},
-                        {'name': 'Konsultasi Arsitektur', 'description': 'Memberikan konsultasi desain bangunan', 'amount': 150000},
-                    ]
-                },
-                {
-                    'name': 'Kontraktor',
-                    'services': [
-                        {'name': 'Pembangunan Gedung', 'description': 'Membangun gedung dari awal', 'amount': 150000},
-                        {'name': 'Renovasi Bangunan', 'description': 'Melakukan renovasi bangunan', 'amount': 150000},
-                    ]
-                },
-                {
-                    'name': 'Insinyur Sipil',
-                    'services': [
-                        {'name': 'Perencanaan Konstruksi', 'description': 'Merencanakan proyek konstruksi', 'amount': 150000},
-                        {'name': 'Pengawasan Konstruksi', 'description': 'Mengawasi proses konstruksi', 'amount': 150000},
-                    ]
-                },
-            ]
+            'name': 'Nawa',
+            'password': 'passwWORd',
+            'gender': 'Perempuan',
+            'date': '2001-06-06',
+            'phone': '081111111117',
+            'saldo': 400000,
+            'address': 'Jl. Melon No. 6'
         },
+        {
+            'name': 'Adel',
+            'password': 'passTword',
+            'gender': 'Perempuan',
+            'date': '2006-08-08',
+            'phone': '081111111119',
+            'saldo': 800000,
+            'address': 'Jl. Stroberi No. 8'
+        },
+        {
+            'name': 'Cia',
+            'password': 'passwordPP',
+            'gender': 'Perempuan',
+            'date': '2008-10-10',
+            'phone': '081111111110',
+            'saldo': 50000,
+            'address': 'Jl. Lemon No. 10'
+        }
     ]
 
-    user = {
-        'name': 'Heri Setyawan',
-        'password':  '083853797950',
-        'gender':  'Laki-Laki',
-        'date':  'Laki-Laki',
-        'phone':  '08-08-2001',
-        'saldo': 1000000, 
-        'address': 'Jln Rengganis'
-    }    
-
-
-    worker = {
-        'name': 'Developer Setyawan',
-        'password':  '083853797951',
-        'gender':  'L',
-        'phone':  '083853797951',
-        'dob':  datetime.now(),
-        'saldo': 1000000, 
-        'address': 'Jln Rengganis',
-        'account_number': '083853797951',
-        'bank_name': 'BRI',
-        'photo_url': 'htttp://example.com',
-    }
+    # Daftar pekerja
+    workers = [
+        {
+            'name': 'Fachri',
+            'password': 'PAssWOrd',
+            'gender': 'L',
+            'phone': '081111111116',
+            'dob': datetime(2003, 5, 5),  # Tanggal lahir
+            'saldo': 1000000,
+            'address': 'Jl. Pisang No. 5',
+            'account_number': '1111111111',
+            'bank_name': 'Bank AAA',
+            'npwp': 'NPWP1',
+            'photo_url': 'https://example.com/foto1.jpg'
+        },
+        {
+            'name': 'Ramadhan',
+            'password': 'PAssword',
+            'gender': 'L',
+            'phone': '081111111111',
+            'dob': datetime(1980, 11, 1),
+            'saldo': 500000,
+            'address': 'Jl. Rambutan No. 1',
+            'account_number': '1111111112',
+            'bank_name': 'Bank BBB',
+            'npwp': 'NPWP2',
+            'photo_url': 'https://example.com/foto2.jpg'
+        },
+        {
+            'name': 'Fawwi',
+            'password': 'passworKK',
+            'gender': 'L',
+            'phone': '081111111118',
+            'dob': datetime(2004, 7, 7),
+            'saldo': 350000,
+            'address': 'Jl. Nanas No. 7',
+            'account_number': '1111111113',
+            'bank_name': 'Bank CCC',
+            'npwp': 'NPWP3',
+            'photo_url': 'https://example.com/foto3.jpg'
+        },
+        {
+            'name': 'Zac',
+            'password': 'password3',
+            'gender': 'L',
+            'phone': '081111111113',
+            'dob': datetime(1995, 3, 3),
+            'saldo': 300000,
+            'address': 'Jl. Jeruk No. 3',
+            'account_number': '1111111114',
+            'bank_name': 'Bank DDD',
+            'npwp': 'NPWP4',
+            'photo_url': 'https://example.com/foto4.jpg'
+        },
+        {
+            'name': 'Gege',
+            'password': 'passwordSD',
+            'gender': 'L',
+            'phone': '081111111115',
+            'dob': datetime(2007, 9, 9),
+            'saldo': 150000,
+            'address': 'Jl. Anggur No. 9',
+            'account_number': '1111111115',
+            'bank_name': 'Bank EEE',
+            'npwp': 'NPWP5',
+            'photo_url': 'https://example.com/foto5.jpg'
+        }
+    ]
 
     promo_codes = ['PROMO2024', 'SALE50', 'NEWYEAR10', 'DISCOUNT30', 'BLACKFRIDAY15', 'PROMO10', 'PROMO20']
 
@@ -156,27 +289,30 @@ def run():
             )
 
 
-    User.objects.create(
-        name=user['name'],
-        password=user['password'],
-        # gender=user['gender'],
-        phone=user['phone'],
-        saldo=user['saldo'],
-        address=user['address'],
-    )
+    for user in users:
+        User.objects.create(
+            name=user['name'],
+            password=user['password'],
+            # gender=user['gender'],
+            phone=user['phone'],
+            saldo=user['saldo'],
+            address=user['address'],
+        )
 
-    Worker.objects.create(
-        name=worker['name'],
-        password=worker['password'],
-        gender=worker['gender'],
-        phone=worker['phone'],
-        saldo=worker['saldo'],
-        address=worker['address'],
-        dob=worker['dob'],
-        account_number=worker['account_number'],
-        bank_name=worker['bank_name'],
-        photo_url=worker['photo_url'],
-    )
+    for worker in workers:
+        Worker.objects.create(
+            name=worker['name'],
+            password=worker['password'],
+            gender=worker['gender'],
+            phone=worker['phone'],
+            saldo=worker['saldo'],
+            address=worker['address'],
+            dob=worker['dob'],
+            account_number=worker['account_number'],
+            bank_name=worker['bank_name'],
+            photo_url=worker['photo_url'],
+            npwp=worker['npwp']
+        )
 
 
     # Menyimpan data ke dalam database

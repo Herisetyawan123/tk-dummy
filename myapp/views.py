@@ -95,6 +95,7 @@ def profile(request):
         })
     if "worker_phone" in request.session:
         worker = Worker.objects.get(phone=request.session["worker_phone"])
+        print(worker.npwp)
         return render(request, "profile.html", {
             "role": "worker",
             "worker": worker
@@ -449,7 +450,6 @@ def transaksi_mypay_view(request):
                     order = Order.objects.get(id=pesanan_jasa)
                     print(order.total_price)
                     if user.saldo >= order.total_price:
-                        # TODO: prosess
                         order.status = 'SEARCHING_WORKER'
                         user.saldo -= order.total_price
                          # Buat instance transaksi
@@ -762,6 +762,9 @@ def update_service(request, order_id):
         order.status = "IN_PROGRESS"
     elif order.status == "IN_PROGRESS":
         order.status = "COMPLETED"
+        worker = Worker.objects.get(id=order_id)
+        worker.saldo += order.total_price
+        worker.save()
     order.save()
     return redirect('kelola_status_pekerjaan')
 
