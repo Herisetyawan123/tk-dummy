@@ -156,7 +156,7 @@
       </div>
       <div class="data">
         <label>Saldo MyPay:</label>
-        <span>Rp 1.000.000</span>
+        <span>Rp {{ user.saldo }}</span>
       </div>
       <a class="button" href="{% url 'update_profile' %}">Update</a>
     </div>
@@ -210,11 +210,15 @@
       </div>
       <div class="data">
         <label>Jumlah Pesanan Selesai:</label>
-        <span>120</span>
+        <span>{{ order_done }}</span>
       </div>
       <div class="data">
         <label>Kategori Pekerjaan:</label>
-        <span>1. Kategori jasa 1<br>2. Kategori jasa 2</span>
+        <span>
+          {% for category in categories %}
+            {{ category.name }} <br>
+          {% endfor %}
+        </span>
       </div>
       <a class="button" href="{% url 'update_profile' %}">Update</a>
     </div>

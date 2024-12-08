@@ -95,10 +95,16 @@ def profile(request):
         })
     if "worker_phone" in request.session:
         worker = Worker.objects.get(phone=request.session["worker_phone"])
-        print(worker.npwp)
+        order = Order.objects.filter(status="COMPLETED")
+        order = order.filter(worker=worker)
+        
+        categories = worker.sub_categories.all()
+       
         return render(request, "profile.html", {
             "role": "worker",
-            "worker": worker
+            "worker": worker,
+            "order_done": len(order),
+            "categories": categories
         })
     return redirect('login')
 
