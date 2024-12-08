@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import choose_role, register_user, register_worker, login, home_user, home_worker, logout, landing, profile, subkategori, daftar_diskon, my_pay, kelola_pesanan, transaksi_mypay_view, view_pemesanan, get_user_pending_orders, beli_diskon
-from .views import choose_role, get_subkategori, register_user, register_worker, login, home_user, home_worker, logout, landing, profile, subkategori, daftar_diskon, my_pay, kelola_pesanan, transaksi_mypay_view, view_pemesanan, get_user_pending_orders, kelola_pekerjaan_worker, get_subkategori, kelola_status_pekerjaan, profile_worker, kerjakan_service, batal_pesanan, update_service, buat_testimoni
+from .views import choose_role, get_subkategori, register_user, register_worker, login, home_user, home_worker, logout, landing, profile, subkategori, daftar_diskon, my_pay, kelola_pesanan, transaksi_mypay_view, view_pemesanan, get_user_pending_orders, kelola_pekerjaan_worker, get_subkategori, kelola_status_pekerjaan, profile_worker, kerjakan_service, batal_pesanan, update_service, buat_testimoni, join_service
 
 urlpatterns = [
     path('', landing, name='landing'),
@@ -29,6 +29,7 @@ urlpatterns = [
 
     # worker
     path('home/worker/', home_worker, name='home_worker'),
+    path('home/worker/join/<str:sub_category_id>', join_service, name='join_service'),
     path('home/worker/kelola-pekerjaan', kelola_pekerjaan_worker, name='kelola_pekerjaan_worker'),
     path('home/worker/kerjakan-service/<str:order_id>', kerjakan_service, name='kerjakan_service'),
     path('home/worker/kelola-status-pekerjaan', kelola_status_pekerjaan, name='kelola_status_pekerjaan'),

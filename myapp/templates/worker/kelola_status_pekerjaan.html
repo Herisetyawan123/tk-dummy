@@ -38,8 +38,13 @@
             <!-- Filter Status -->
             <select id="status-pesanan" name="status-pesanan"
                 class="w-1/4 p-2 py-2.5 border rounded-md focus:outline-none focus:ring focus:border-[#969b4a]">
-                <option value="">Status Pesanan</option>
+                <option value="">Semua Status</option>
+                <option value="awaiting_payment">Menunggu Pembayaran</option>
+                <option value="in_progress">Sedang Dikerjakan</option>
+                <option value="completed">Selesai</option>
+                <option value="ARRIVE_WORKER">Tiba Dilokasi</option>
             </select>
+
 
             <!-- Tombol Submit -->
             <button type="submit" class="px-4 py-2 text-white bg-[#969b4a] rounded-md hover:bg-[#7a7e37]">
@@ -61,9 +66,10 @@
                             <th class="p-4 text-center rounded-tr-lg">Status Pesanan</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="order-table">
                         {% for order in orders %}
-                        <tr class="hover-effect">
+                        <tr class="hover-effect" data-nama-jasa="{{ order.service.name|lower }}"
+                            data-status="{{ order.status|lower }}">
                             <td class="p-4 text-center border-t">
                                 {{ order.service.sub_category.name }}
                             </td>
@@ -141,27 +147,42 @@
     </div>
     </div>
 
-    <!-- <script>
-        $(document).ready(function() {
-            $('#kategori').change(function() {
-                let kategoriId = $(this).val();
-                $('#subkategori').empty();
-                $('#subkategori').append('<option value="">Pilih Subkategori</option>');
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const namaJasaInput = document.getElementById("nama-jasa");
+            const statusSelect = document.getElementById("status-pesanan");
+            const tableRows = document.querySelectorAll("#order-table tr");
 
-                if (kategoriId) {
-                    $.ajax({
-                        url: '/myapp/api/subkategori/' + kategoriId,
-                        method: 'GET',
-                        success: function(data) {
-                            data.forEach(function(subkategori) {
-                                $('#subkategori').append('<option value="' + subkategori.id + '">' + subkategori.name + '</option>');
-                            });
-                        }
-                    });
-                }
-            });
+            function filterTable() {
+                console.log("object")
+                const namaJasaValue = namaJasaInput.value.toLowerCase();
+                const statusValue = statusSelect.value.toLowerCase();
+
+                tableRows.forEach(row => {
+                    const namaJasa = row.getAttribute("data-nama-jasa");
+                    const status = row.getAttribute("data-status");
+
+
+                    console.log(row)
+                    // Cek apakah row sesuai dengan filter
+                    const matchesNamaJasa = namaJasa.includes(namaJasaValue);
+                    const matchesStatus = !statusValue || status === statusValue;
+
+                    // Tampilkan/hilangkan row berdasarkan kecocokan
+                    if (matchesNamaJasa && matchesStatus) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+            }
+
+            // Tambahkan event listener
+            namaJasaInput.addEventListener("input", filterTable);
+            statusSelect.addEventListener("change", filterTable);
         });
-    </script> -->
+    </script>
+
 </body>
 
 </html>

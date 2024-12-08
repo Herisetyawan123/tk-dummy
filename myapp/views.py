@@ -335,7 +335,9 @@ def subkategori(request, subcategory_id):
         workers = subkategori.workers.all()
         service_ids = [service.id for service in services]
         testimonials = Testimonial.objects.filter(service__in=services)
-        return render(request, 'sub_category.html', {'subcategory': subkategori, 'services': services, 'testimonials': testimonials, 'workers': workers, "role": request.session['role']})
+        is_join = Worker.objects.get(phone=request.session["worker_phone"]).sub_categories.filter(id=subkategori.id).exists()
+        # print(is_join)
+        return render(request, 'sub_category.html', {'subcategory': subkategori, 'services': services, 'testimonials': testimonials, 'workers': workers, "role": request.session['role'], "is_join": is_join})
     except SubJobCategory.DoesNotExist:
         return render(request, '404.html', {'message': 'ID Subkategori tidak ditemukan atau tidak valid.'}, status=404)
 
@@ -439,10 +441,7 @@ def transaksi_mypay_view(request):
                 # Simpan transaksi ke database
                 transaction.save()
                 messages.success(request, 'Top Up Berhasil!')
-                if auth_role == "worker":
-                    return redirect('my_pay_worker')
-                else:
-                    return redirect('my_pay_worker')
+
             else:
                 messages.error(request, 'Nominal tidak valid.')
 
@@ -473,10 +472,7 @@ def transaksi_mypay_view(request):
                         transaction.save()
                         print("success")
                         messages.success(request, 'Pembayaran Berhasil!')
-                        if auth_role == "worker":
-                            return redirect('my_pay_worker')
-                        else:
-                            return redirect('my_pay_worker')
+                    
                     else:
                         messages.error(request, 'Saldo tidak mencukupi.')
                 except (IndexError, ValueError):
@@ -578,10 +574,6 @@ def transaksi_mypay_view(request):
                         transaction.save()
                     # Simpan transaksi ke database
                     messages.success(request, 'Transfer Berhasil!')
-                    if auth_role == "worker":
-                        return redirect('my_pay_worker')
-                    else:
-                        return redirect('my_pay_worker')
                 else:
                     messages.error(request, 'Jumlah transfer tidak valid atau saldo tidak mencukupi.')
             else:
@@ -617,10 +609,7 @@ def transaksi_mypay_view(request):
                 # Simpan transaksi ke database
                 transaction.save()
                 messages.success(request, 'Withdrawal Berhasil!')
-                if auth_role == "worker":
-                    return redirect('my_pay_worker')
-                else:
-                    return redirect('my_pay_worker')
+
             else:
                 messages.error(request, 'Jumlah withdrawal tidak valid atau saldo tidak mencukupi.')
 
@@ -682,7 +671,8 @@ def kelola_pesanan(request):
 
     # Ambil semua order yang terkait dengan pengguna
     orders = Order.objects.filter(user=user)
-    return render(request, 'user/kelola_pesanan.html', { 'orders': orders})
+    subkategori = SubJobCategory.objects.all()
+    return render(request, 'user/kelola_pesanan.html', { 'orders': orders, "subkategori": subkategori})
 
 def view_pemesanan(request, id):
     service = Service.objects.get(id=id)
@@ -826,6 +816,18 @@ def update_service(request, order_id):
         print("selesai", order.worker.id)
     order.save()
     return redirect('kelola_status_pekerjaan')
+
+def join_service(request, sub_category_id):
+    if "worker_phone" not in request.session:
+        return redirect("login")
+    worker = Worker.objects.get(phone=request.session["worker_phone"])
+        # Ambil objek subkategori berdasarkan ID yang diterima
+    subcategories = SubJobCategory.objects.filter(id__in=sub_category_id)
+    
+    # Gabungkan pekerja dengan subkategori yang dipilih
+    worker.sub_categories.add(*subcategories)
+
+    return redirect(request.META.get('HTTP_REFERER', 'default_url'))
 
 def buat_testimoni(request, order_id):
     if "user_phone" not in request.session:
