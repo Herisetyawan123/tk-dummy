@@ -45,7 +45,7 @@ class Testimonial(models.Model):
     rating = models.PositiveIntegerField()  # Field to store the rating (1-5, for example)
 
     def __str__(self):
-        return f'Testimonial by {self.user.username} for {self.subcategory.name}'
+        return f'Testimonial by {self.user.name} for {self.service.name}'
 
 class Worker(models.Model):
     name = models.CharField(max_length=100)

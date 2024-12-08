@@ -110,16 +110,24 @@ def profile(request):
         })
     if "worker_phone" in request.session:
         worker = Worker.objects.get(phone=request.session["worker_phone"])
+
         order = Order.objects.filter(status="COMPLETED")
         order = order.filter(worker=worker)
         
         categories = worker.sub_categories.all()
-       
+
+        jumlah = 0
+        for o in order:
+            testi = Testimonial.objects.get(service=o.service)
+            jumlah += testi.rating
+
+        print(jumlah, "/", len(order) * 5)
         return render(request, "profile.html", {
             "role": "worker",
             "worker": worker,
             "order_done": len(order),
-            "categories": categories
+            "categories": categories,
+            "rating": jumlah / len(order) 
         })
     return redirect('login')
 
