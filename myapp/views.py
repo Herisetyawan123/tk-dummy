@@ -121,13 +121,13 @@ def profile(request):
             testi = Testimonial.objects.get(service=o.service)
             jumlah += testi.rating
 
-        print(jumlah, "/", len(order) * 5)
+    
         return render(request, "profile.html", {
             "role": "worker",
             "worker": worker,
             "order_done": len(order),
             "categories": categories,
-            "rating": jumlah / len(order) 
+            "rating": jumlah if jumlah == 0 else jumlah / len(order) 
         })
     return redirect('login')
 
