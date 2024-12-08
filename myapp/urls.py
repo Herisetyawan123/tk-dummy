@@ -33,6 +33,6 @@ urlpatterns = [
     path('home/worker/kerjakan-service/<str:order_id>', kerjakan_service, name='kerjakan_service'),
     path('home/worker/kelola-status-pekerjaan', kelola_status_pekerjaan, name='kelola_status_pekerjaan'),
     path('api/subkategori/<str:kategori_id>', get_subkategori, name='get_subkategori'),
-    path('home/worker/profile', profile_worker, name='worker_profile'),
+    path('home/worker/profile', profile, name='worker_profile'),
     path('logout/', logout, name='logout'),
 ]

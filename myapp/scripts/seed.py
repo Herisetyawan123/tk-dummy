@@ -91,8 +91,9 @@ def run():
     user = {
         'name': 'Heri Setyawan',
         'password':  '083853797950',
-        # 'gender':  'L',
-        'phone':  '083853797950',
+        'gender':  'Laki-Laki',
+        'date':  'Laki-Laki',
+        'phone':  '08-08-2001',
         'saldo': 1000000, 
         'address': 'Jln Rengganis'
     }    

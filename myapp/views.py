@@ -33,9 +33,9 @@ def register_user(request):
                 user_profile = User(
                     name=name,
                     password=password,
-                    # gender=gender,
+                    gender=gender,
                     phone=phone,
-                    # dob=dob_date,
+                    date=dob_date,
                     address=address
                 )
                 user_profile.save() 
@@ -87,7 +87,19 @@ def register_worker(request):
     return render(request, 'register_worker.html', {'form': form})
 
 def profile(request):
-    return render(request, "profile.html")
+    if "user_phone" in request.session:
+        user = User.objects.get(phone=request.session["user_phone"])
+        return render(request, "profile.html", {
+            "role": "user",
+            "user": user
+        })
+    if "worker_phone" in request.session:
+        worker = Worker.objects.get(phone=request.session["worker_phone"])
+        return render(request, "profile.html", {
+            "role": "worker",
+            "worker": worker
+        })
+    return redirect('login')
 
 def login(request):
     if request.method == 'POST':

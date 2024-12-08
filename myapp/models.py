@@ -4,8 +4,11 @@ class User(models.Model):
     name = models.CharField(max_length=100)
     password = models.CharField(max_length=100)
     phone = models.CharField(max_length=15)
+    gender = models.CharField(max_length=15)
+    url_photo = models.CharField(max_length=15)
     address = models.TextField()
     saldo = models.DecimalField(max_digits=12, decimal_places=2, default=0.00) 
+    date = models.CharField(max_length=15)
 
     def __str__(self):
         return self.name
